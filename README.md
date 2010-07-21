@@ -5,7 +5,7 @@ Two script to make a static build of ffmpeg with all the latest codecs (webm + h
 
 NOTE: there remains some dependencies I don't know how to remove. If you have any ideas, you're welcome to help.
 
-$ ldd build/bin/ffmpeg
+    $ ldd build/bin/ffmpeg
 	linux-gate.so.1 =>  (0xb78df000)
 	libm.so.6 => /lib/tls/i686/cmov/libm.so.6 (0xb789f000)
 	libz.so.1 => /lib/libz.so.1 (0xb788a000)
@@ -16,21 +16,21 @@ $ ldd build/bin/ffmpeg
 Dependencies
 ------------
 
-# Debian & Ubuntu
-$ apt-get install build-essential git-core <FIXME>
+    # Debian & Ubuntu
+    $ apt-get install build-essential git-core <FIXME>
 
 
 Build
 -----
 
-# This step is only needed once, it's to get all the source packages
-$ ./fetch.sh
-# ... wait ...
-# files are fetched in the ./cache/ directory
+    # This step is only needed once, it's to get all the source packages
+    $ ./fetch.sh
+    # ... wait ...
+    # files are fetched in the ./cache/ directory
 
-$ ./build.sh
-# ... wait ...
-# binaries can be found in ./target/bin/
+    $ ./build.sh
+    # ... wait ...
+    # binaries can be found in ./target/bin/
 
 TODO
 ----
