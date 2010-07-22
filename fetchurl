@@ -1,0 +1,138 @@
+#!/usr/bin/env ruby
+#
+# Small utility to fetch and unpack urls (with cache)
+#
+# Depends on : wget, tar
+#
+require 'optparse'
+require 'uri'
+require 'tmpdir'
+require 'fileutils'
+require 'digest/sha1'
+
+include FileUtils
+
+options = {
+  :unpack => true,
+  :target_dir => Dir.pwd,
+  :cache_dir => ENV["HOME"] && ENV["HOME"].any? && "~/.cache/fetchurl",
+  :cache => true
+}
+
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename $0} [options]"
+
+  opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+    options[:verbose] = v
+  end
+  opts.on("-u", "--[no-]unpack", "Decide to unpack the fetched source") do |u|
+    options[:unpack] = u
+  end
+  opts.on("-n", "--[no-]cache", "Decide to use the cache or not") do |c|
+    options[:cache] = c
+  end
+  opts.on("-t", "--target-dir PATH", "Where to unpack the file") do |path|
+    options[:target_dir] = path
+  end
+  opts.on("-c", "--cache-dir PATH", "Where to cache the downloaded files") do |path|
+    options[:cache_dir] = path
+  end
+  opts.on("--sha1 SHA1", "Verify download with checksum") do |sha1|
+    options[:sha1sum] = sha1
+  end
+end
+
+if !options[:cache_dir] && options[:cache]
+  $stderr.puts "ERROR: missing cache dir"
+  $stderr.puts opts
+  exit 1
+end
+
+begin
+  opts.parse!
+rescue OptionParser::ParseError => ex
+  $stderr.puts ex
+  $stderr.puts opts
+  exit 1
+end
+
+if ARGV.size < 1
+  $stderr.puts "ERROR: missing url argument"
+  $stderr.puts opts
+  exit 1
+end
+
+if options[:verbose]
+  def sh(*args)
+    $stdout.puts "$ " + args.join(' ')
+    system *args
+  end
+else
+  require 'open3'
+  def sh(*args)
+    $stdout.puts "$ " + args.join(' ')
+    begin
+      # temporarily redirect stdout
+      orig_stdout = $stdout.dup
+      $stdout.reopen '/dev/null', 'w'
+      ret = system *args
+    ensure
+      $stdout.reopen orig_stdout
+    end
+    return ret
+  end
+end
+
+options[:url] = ARGV[0]
+
+filename = File.basename(URI.parse(options[:url]).path)
+
+tmp_file = Dir.tmpdir + '/' + filename
+cache_file = File.expand_path(options[:cache_dir] + '/' + filename)
+
+mkdir_p File.expand_path options[:cache_dir]
+
+# Fetch
+if options[:cache] && !File.exists?(cache_file)
+  rm_rf tmp_file
+  sh 'curl', '-L', '-o', tmp_file, options[:url]
+  if $? != 0
+    $stderr.puts "ERROR while fetching the file"
+    exit 1
+  end
+  mv tmp_file, cache_file
+end
+$stdout.puts "*** File downloaded to #{cache_file}"
+
+# Checksum
+sha1 = Digest::SHA1.hexdigest File.read(cache_file)
+if options[:sha1sum]
+  if sha1 != options[:sha1sum].downcase
+    $stderr.puts "ERROR: checksum #{sha1} does not match to given parameter"
+    exit 1
+  end
+else
+  $stdout.puts "*** Checksum is #{sha1}"
+end
+
+# Unpack
+if options[:unpack]
+  extname = /(?:\.tar)?\.[^.]+$|$/.match(filename)[0]
+  basename = File.basename(filename, extname)
+  
+  target_dir = File.expand_path(options[:target_dir])
+  mkdir_p target_dir
+  Dir.chdir(target_dir) do
+    case extname
+    when ".tar.gz", ".tgz":
+      sh "tar xzvf #{cache_file}"
+    when ".tar.bz2":
+      sh "tar xjvf #{cache_file}"
+    else
+      $stderr.puts "ERROR: #{extname} not supported"
+      exit 1
+    end
+  end
+  $stdout.puts "*** File extracted to #{target_dir}"
+end
+

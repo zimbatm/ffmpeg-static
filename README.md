@@ -17,16 +17,11 @@ Dependencies
 ------------
 
     # Debian & Ubuntu
-    $ apt-get install build-essential git-core <FIXME>
+    $ apt-get install build-essential git-core ruby1.8 curl tar <FIXME>
 
 
 Build
 -----
-
-    # This step is only needed once, it's to get all the source packages
-    $ ./fetch.sh
-    # ... wait ...
-    # files are fetched in the ./cache/ directory
 
     $ ./build.sh
     # ... wait ...
@@ -36,3 +31,4 @@ TODO
 ----
 
  * remove remaining libs
+ * re-write fetchurl in shell instead of ruby to avoid dependency
