@@ -13,11 +13,11 @@ NOTE: there remains some dependencies I don't know how to remove. If you have an
 	libc.so.6 => /lib/tls/i686/cmov/libc.so.6 (0xb7716000)
 	/lib/ld-linux.so.2 (0xb78e0000)
 
-Dependencies
-------------
+Build dependencies
+------------------
 
     # Debian & Ubuntu
-    $ apt-get install build-essential git-core curl tar <FIXME???>
+    $ apt-get install build-essential curl tar <FIXME???>
 
 
 Build
