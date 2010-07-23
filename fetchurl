@@ -62,7 +62,7 @@ if [ -z "$CACHE_DIR" ] && [ "$CACHE" -ne 0 ]; then
   usage
 fi
 
-filename=`basename "$URL" | sed 's/\\\?.*//'`
+filename=`basename "$URL" | sed 's/\?.*//'`
 tmp_file="$TMP_DIR/$filename"
 cache_file="$CACHE_DIR/$filename"
 
