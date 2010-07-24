@@ -90,8 +90,8 @@ log ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
 log make -j 4 && make install
 
 # FIXME: only OS-sepcific
-log rm "$TARGET_DIR/lib/*.dylib"
-log rm "$TARGET_DIR/lib/*.so"
+log rm -f "$TARGET_DIR/lib/*.dylib"
+log rm -f "$TARGET_DIR/lib/*.so"
 
 # FFMpeg
 log cd "$BUILD_DIR/ffmpeg-0.6"
