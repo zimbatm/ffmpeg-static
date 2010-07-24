@@ -38,6 +38,13 @@ sh () {
   fi
 }
 
+expand_path() {
+	here=`pwd`
+	cd $1
+	echo `pwd -P`
+	cd "$here"
+}
+
 usage() {
   echo "Usage: fetchurl url"
   echo "CACHE=${CACHE}"
@@ -79,10 +86,19 @@ fi
 
 # Unpack
 if [ "$UNPACK" -ne 0 ]; then
-  extname=`echo "$filename" | sed 's/.*\(\.tar\.gz\|\.tgz\|\.tar\.bz2\)$/\1/'`
-  bname=`basename "$filename" "$extname"`  
-  target_dir=`readlink -f "$TARGET_DIR"`
 
+  if [ "$filename" != "${filename%.tar.gz}" ]; then
+    extname=.tar.gz
+  elif [ "$filename" != "${filename%.tgz}" ]; then
+    extname=.tgz
+  elif [ "$filename" != "${filename%.tar.bz2}" ]; then
+    extname=.tar.bz2
+  else
+    stderr extension of $filename is not supported
+    exit 1
+  fi
+
+  target_dir=`expand_path "$TARGET_DIR"`
   mkdir -p "$target_dir"
   sh cd "$target_dir"
   
@@ -94,7 +110,7 @@ if [ "$UNPACK" -ne 0 ]; then
       sh tar xjvf "$cache_file"
     ;;
     *)
-      stderr $extname extension not supported
+      stderr BUG, this should not happen
       exit 1
     ;;
   esac
