@@ -5,7 +5,7 @@ set -u
 
 cd `dirname $0`
 ENV_ROOT=`pwd`
-. env.source
+. ./env.source
 LOG_FILE="$ENV_ROOT"/build-`date +%Y-%m-%d@%Hh%M`.log
 
 rm -rf "$BUILD_DIR" "$TARGET_DIR"
