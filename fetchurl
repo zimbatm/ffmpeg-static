@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# Small utility to fetch and unpack urls (with cache)
+# Small utility to fetch and unpack archives on the web (with cache)
 #
-# Depends on : wget, tar
+# Depends on : curl, tar
 #
 
 set -e
