@@ -33,7 +33,7 @@ log ../fetchurl "http://downloads.sourceforge.net/project/faac/faac-src/faac-1.2
 log ../fetchurl "ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20100620-2245.tar.bz2"
 log ../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.bz2"
 log ../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.98.4/lame-3.98.4.tar.gz?use_mirror=auto"
-log ../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-0.6.tar.gz"
+log ../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-0.6.1.tar.gz"
 
 log cd "$BUILD_DIR/yasm-1.0.1"
 log ./configure --prefix=$TARGET_DIR
@@ -94,7 +94,7 @@ log rm -f "$TARGET_DIR/lib/*.dylib"
 log rm -f "$TARGET_DIR/lib/*.so"
 
 # FFMpeg
-log cd "$BUILD_DIR/ffmpeg-0.6"
+log cd "$BUILD_DIR/ffmpeg-0.6.1"
 log ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
 log make -j 4 && make install
 
