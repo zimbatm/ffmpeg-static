@@ -56,8 +56,8 @@ NOTE: there remains some dependencies I don't know how to remove. If you have an
 	ffmpeg:
 		/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 125.2.0)
 	
-
-
+ * Add some tests to check that video output is correctly generated
+   this would help upgrading the package without too much work
  * OSX's xvidcore does not detect yasm correctly
  * remove remaining libs
  
