@@ -29,28 +29,26 @@ NOTE: If you're going to use the h264 presets, make sure to copy them along the 
     $ mkdir ~/.ffmpeg
     $ cp ./target/share/ffmpeg/*.ffpreset ~/.ffmpeg
 
-Make sure to copy the presets somewhere along ffmpeg if you're using them.
-  One sure way is to use the ~/.ffpresets folder to 
-
 Debug
 -----
 
 On the top-level of the project, run:
 
-	$ ENV_ROOT=`pwd`
 	$ . env.source
 	
-Then you can enter the source folders and make the compilation yourself
+You can then enter the source folders and make the compilation yourself
 
 	$ cd build/ffmpeg-*
 	$ ./configure --prefix=$TARGET_DIR #...
 	# ...
 
-TODO
-----
+Remaining links
+---------------
 
-NOTE: there remains some dependencies I don't know how to remove. If you have any ideas, you're welcome to help.
+I'm not sure it's a good idea to statically link those, but it probably
+means the executable won't work across distributions or even across releases.
 
+    # On Ubuntu 10.04:
     $ ldd build/bin/ffmpeg
 	linux-gate.so.1 =>  (0xb78df000)
 	libm.so.6 => /lib/tls/i686/cmov/libm.so.6 (0xb789f000)
@@ -59,11 +57,14 @@ NOTE: there remains some dependencies I don't know how to remove. If you have an
 	libc.so.6 => /lib/tls/i686/cmov/libc.so.6 (0xb7716000)
 	/lib/ld-linux.so.2 (0xb78e0000)
 
-	# on OSX it's better:
+    # on OSX 10.6.4:
     $ otool -L ffmpeg 
 	ffmpeg:
 		/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 125.2.0)
-	
+
+TODO
+----
+
  * Add some tests to check that video output is correctly generated
    this would help upgrading the package without too much work
  * OSX's xvidcore does not detect yasm correctly
