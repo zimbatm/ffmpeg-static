@@ -18,7 +18,7 @@ cd $BUILD_DIR
 ../fetchurl "http://www.tortall.net/projects/yasm/releases/yasm-1.0.1.tar.gz"
 ../fetchurl "http://zlib.net/zlib-1.2.5.tar.bz2"
 ../fetchurl "http://www.bzip.org/1.0.5/bzip2-1.0.5.tar.gz"
-../fetchurl "http://downloads.sourceforge.net/project/libpng/03-libpng-previous/1.2.44/libpng-1.2.44.tar.bz2"
+../fetchurl "http://downloads.sourceforge.net/project/libpng/libpng12/1.2.46/libpng-1.2.46.tar.bz2"
 ../fetchurl "http://downloads.xiph.org/releases/ogg/libogg-1.2.0.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.1.tar.bz2"
 ../fetchurl "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
@@ -36,7 +36,7 @@ make -j 4 && make install
 
 echo "*** Building zlib ***"
 cd "$BUILD_DIR/zlib-1.2.5"
-./configure --prefix=$TARGET_DIR 
+./configure --prefix=$TARGET_DIR
 make -j 4 && make install
 
 echo "*** Building bzip2 ***"
@@ -45,7 +45,7 @@ make
 make install PREFIX=$TARGET_DIR
 
 echo "*** Building libpng ***"
-cd "$BUILD_DIR/libpng-1.2.44"
+cd "$BUILD_DIR/libpng-1.2.46"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
 make -j 4 && make install
 
