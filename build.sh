@@ -102,6 +102,6 @@ rm -f "$TARGET_DIR/lib/*.so"
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd "$BUILD_DIR/ffmpeg-0.6.1"
-./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
+./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libmp3lame --disable-devices # --enable-libfaac --enable-libtheora --enable-libxvid  --enable-nonfree --enable-version3 --enable-libvpx --enable-bzlib --enable-zlib --enable-libvorbis --enable-libx264 
 make -j 4 && make install
 
