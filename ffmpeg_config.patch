@@ -1,0 +1,14 @@
+--- ffmpeg-0.6.1/configure      2010-06-15 21:44:30.000000000 +0200
++++ ffmpeg-static/build/ffmpeg-0.6.1/configure  2012-03-08 12:57:12.984471102 +0100
+@@ -629,7 +631,9 @@
+         test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
+     done
+     check_cc $($filter_cflags $flags) || return
+-    check_cmd $ld $LDFLAGS $flags -o $TMPE $TMPO $extralibs $libs
++       extralibs=`echo "$extralibs" | sed s/-lm\s+//`
++       extralibs="$extralibs -lm"
++    check_cmd $ld $LDFLAGS $flags -o $TMPE $TMPO $libs $extralibs 
+ }
+ 
+ check_cppflags(){
+
