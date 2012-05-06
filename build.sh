@@ -35,7 +35,7 @@ cd "$BUILD_DIR/yasm-1.2.0"
 make -j 4 && make install
 
 echo "*** Building zlib ***"
-cd "$BUILD_DIR/zlib-1.2.6"
+cd "$BUILD_DIR/zlib-1.2.7"
 ./configure --prefix=$TARGET_DIR
 make -j 4 && make install
 
