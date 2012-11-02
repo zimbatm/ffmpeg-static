@@ -3,6 +3,30 @@
 set -e
 set -u
 
+jflag=
+jval=4
+
+while getopts 'j:' OPTION
+do
+  case $OPTION in
+  j)	jflag=1
+        	jval="$OPTARG"
+	        ;;
+  ?)	printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%)\n" $(basename $0) >&2
+		exit 2
+		;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+if [ "$jflag" ]
+then
+  if [ "$jval" ]
+  then
+    printf "Option -j specified (%d)\n" $jval
+  fi
+fi
+
 cd `dirname $0`
 ENV_ROOT=`pwd`
 . ./env.source
@@ -32,12 +56,12 @@ cd $BUILD_DIR
 echo "*** Building yasm ***"
 cd "$BUILD_DIR/yasm-1.2.0"
 ./configure --prefix=$TARGET_DIR
-make -j 4 && make install
+make -j $jval && make install
 
 echo "*** Building zlib ***"
 cd "$BUILD_DIR/zlib-1.2.7"
 ./configure --prefix=$TARGET_DIR
-make -j 4 && make install
+make -j $jval && make install
 
 echo "*** Building bzip2 ***"
 cd "$BUILD_DIR/bzip2-1.0.6"
@@ -47,29 +71,29 @@ make install PREFIX=$TARGET_DIR
 echo "*** Building libpng ***"
 cd "$BUILD_DIR/libpng-1.2.50"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 # Ogg before vorbis
 echo "*** Building libogg ***"
 cd "$BUILD_DIR/libogg-1.3.0"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 # Vorbis before theora
 echo "*** Building libvorbis ***"
 cd "$BUILD_DIR/libvorbis-1.3.3"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 echo "*** Building libtheora ***"
 cd "$BUILD_DIR/libtheora-1.1.1"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 echo "*** Building livpx ***"
 cd "$BUILD_DIR/libvpx-v1.0.0"
 ./configure --prefix=$TARGET_DIR --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 echo "*** Building faac ***"
 cd "$BUILD_DIR/faac-1.28"
@@ -77,24 +101,24 @@ cd "$BUILD_DIR/faac-1.28"
 # FIXME: gcc incompatibility, does not work with log()
 
 sed -i -e "s|^char \*strcasestr.*|//\0|" common/mp4v2/mpeg4ip.h
-make -j 4 && make install
+make -j $jval && make install
 
 echo "*** Building x264 ***"
 cd "$BUILD_DIR/x264-snapshot-20120425-2245"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 
 echo "*** Building xvidcore ***"
 cd "$BUILD_DIR/xvidcore/build/generic"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 #rm $TARGET_DIR/lib/libxvidcore.so.*
 
 echo "*** Building lame ***"
 cd "$BUILD_DIR/lame-3.99.5"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j 4 && make install
+make -j $jval && make install
 
 # FIXME: only OS-sepcific
 rm -f "$TARGET_DIR/lib/*.dylib"
@@ -105,5 +129,5 @@ echo "*** Building FFmpeg ***"
 cd "$BUILD_DIR/ffmpeg-0.10.2"
 patch -p1 <../../ffmpeg_config.patch
 CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
-make -j 4 && make install
+make -j $jval && make install
 
