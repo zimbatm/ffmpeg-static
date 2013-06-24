@@ -42,16 +42,16 @@ cd $BUILD_DIR
 ../fetchurl "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz"
 ../fetchurl "http://zlib.net/zlib-1.2.8.tar.gz"
 ../fetchurl "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
-../fetchurl "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng12/libpng-1.2.50.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/ogg/libogg-1.3.0.tar.gz"
+../fetchurl "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.2.tar.gz"
+../fetchurl "http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
-../fetchurl "http://webm.googlecode.com/files/libvpx-v1.0.0.tar.bz2"
+../fetchurl "http://webm.googlecode.com/files/libvpx-v1.1.0.tar.bz2"
 ../fetchurl "http://downloads.sourceforge.net/project/faac/faac-src/faac-1.28/faac-1.28.tar.bz2?use_mirror=auto"
-../fetchurl "ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20120425-2245.tar.bz2"
+../fetchurl "ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20130623-2245.tar.bz2"
 ../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz"
 ../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz?use_mirror=auto"
-../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-1.2.tar.bz2"
+../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-1.2.1.tar.bz2"
 
 echo "*** Building yasm ***"
 cd "$BUILD_DIR/yasm-1.2.0"
@@ -75,7 +75,7 @@ make -j $jval && make install
 
 # Ogg before vorbis
 echo "*** Building libogg ***"
-cd "$BUILD_DIR/libogg-1.3.0"
+cd "$BUILD_DIR/libogg-1.3.1"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
 make -j $jval && make install
 
@@ -91,7 +91,7 @@ cd "$BUILD_DIR/libtheora-1.1.1"
 make -j $jval && make install
 
 echo "*** Building livpx ***"
-cd "$BUILD_DIR/libvpx-v1.0.0"
+cd "$BUILD_DIR/libvpx-v1.0.1"
 ./configure --prefix=$TARGET_DIR --disable-shared
 make -j $jval && make install
 
@@ -104,8 +104,8 @@ sed -i -e "s|^char \*strcasestr.*|//\0|" common/mp4v2/mpeg4ip.h
 make -j $jval && make install
 
 echo "*** Building x264 ***"
-cd "$BUILD_DIR/x264-snapshot-20120425-2245"
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+cd "$BUILD_DIR/x264-snapshot-20130623-2245"
+./configure --prefix=$TARGET_DIR --enable-static --disable-avs --disable-opencl
 make -j $jval && make install
 
 
@@ -126,7 +126,7 @@ rm -f "$TARGET_DIR/lib/*.so"
 
 # FFMpeg
 echo "*** Building FFmpeg ***"
-cd "$BUILD_DIR/ffmpeg-1.2"
+cd "$BUILD_DIR/ffmpeg-1.2.1"
 CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
 make -j $jval && make install
 
