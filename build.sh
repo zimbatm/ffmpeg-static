@@ -108,7 +108,6 @@ cd $BUILD_DIR/x264*
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
 make -j $jval && make install
 
-
 echo "*** Building xvidcore ***"
 cd "$BUILD_DIR/xvidcore/build/generic"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
@@ -119,7 +118,6 @@ echo "*** Building lame ***"
 cd $BUILD_DIR/lame*
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
 make -j $jval && make install
-
 
 # FIXME: only OS-specific
 rm -f "$TARGET_DIR/lib/*.dylib"
