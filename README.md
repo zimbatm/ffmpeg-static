@@ -10,7 +10,7 @@ Build dependencies
 ------------------
 
     # Debian & Ubuntu
-    $ apt-get install build-essential curl tar <FIXME???>
+    $ apt-get install build-essential curl tar
 
 	# OS X
 	# install XCode, it can be found at http://developer.apple.com/
@@ -20,7 +20,7 @@ Build dependencies
 Build & "install"
 -----------------
 
-    $ ./build.sh
+    $ ./build.sh or build-ubuntu.sh
     # ... wait ...
     # binaries can be found in ./target/bin/
 
@@ -49,13 +49,8 @@ I'm not sure it's a good idea to statically link those, but it probably
 means the executable won't work across distributions or even across releases.
 
     # On Ubuntu 10.04:
-    $ ldd build/bin/ffmpeg
-	linux-gate.so.1 =>  (0xb78df000)
-	libm.so.6 => /lib/tls/i686/cmov/libm.so.6 (0xb789f000)
-	libz.so.1 => /lib/libz.so.1 (0xb788a000)
-	libpthread.so.0 => /lib/tls/i686/cmov/libpthread.so.0 (0xb7870000)
-	libc.so.6 => /lib/tls/i686/cmov/libc.so.6 (0xb7716000)
-	/lib/ld-linux.so.2 (0xb78e0000)
+    $ ldd ./target/bin/ffmpeg 
+	not a dynamic executable
 
     # on OSX 10.6.4:
     $ otool -L ffmpeg 
