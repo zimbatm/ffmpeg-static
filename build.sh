@@ -71,7 +71,8 @@ make install PREFIX=$TARGET_DIR
 echo "*** Building libpng ***"
 cd $BUILD_DIR/libpng*
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval && make install
+make -j $jval
+make install
 
 # Ogg before vorbis
 echo "*** Building libogg ***"
