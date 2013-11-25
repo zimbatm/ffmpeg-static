@@ -13,7 +13,7 @@ CACHE=${CACHE:-1}
 UNPACK=${UNPACK:-1}
 VERBOSE=${VERBOSE:-0}
 
-TARGET_DIR=${TARGET_DIR:-`pwd`}
+EXTRACT_DIR=${EXTRACT_DIR:-`pwd`}
 if [ -n "$HOME" ]; then
   CACHE_DIR=${CACHE_DIR:-$HOME/.cache/fetchurl}
 else
@@ -51,7 +51,7 @@ usage() {
   echo "UNPACK=${UNPACK}"
   echo "VERBOSE=${VERBOSE}"
 
-  echo "TARGET_DIR=${TARGET_DIR}"
+  echo "EXTRACT_DIR=${EXTRACT_DIR}"
   echo "CACHE_DIR=${CACHE_DIR}"
   echo "TMP_DIR=${TMP_DIR}"
 
@@ -98,7 +98,7 @@ if [ "$UNPACK" -ne 0 ]; then
     exit 1
   fi
 
-  target_dir=`expand_path "$TARGET_DIR"`
+  target_dir=`expand_path "$EXTRACT_DIR"`
   mkdir -p "$target_dir"
   sh cd "$target_dir"
   
