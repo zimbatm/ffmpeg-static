@@ -52,7 +52,7 @@ cd $BUILD_DIR
 ../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz"
 ../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
 ../fetchurl "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
-../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.1.tar.bz2"
+../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.1.1.tar.bz2"
 
 echo "*** Building yasm ***"
 cd $BUILD_DIR/yasm*
@@ -134,7 +134,8 @@ make install
 echo "*** Building opus ***"
 cd $BUILD_DIR/opus*
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval && make install
+make -j $jval
+make install
 
 # FIXME: only OS-specific
 rm -f "$TARGET_DIR/lib/*.dylib"
