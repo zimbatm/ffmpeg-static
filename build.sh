@@ -51,7 +51,7 @@ cd $BUILD_DIR
 ../fetchurl "ftp://ftp.videolan.org/pub/x264/snapshots/last_x264.tar.bz2"
 ../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz"
 ../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz"
+../fetchurl "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
 ../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.1.tar.bz2"
 
 echo "*** Building yasm ***"
