@@ -144,5 +144,36 @@ rm -f "$TARGET_DIR/lib/*.so"
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/ffmpeg*
-CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-cflags="-I$TARGET_DIR/include -static" --extra-ldflags="-L$TARGET_DIR/lib -lm -static" --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
+./configure \
+	--prefix=${OUTPUT_DIR:-$TARGET_DIR} \
+	--extra-cflags="-I$TARGET_DIR/include -static" \
+	--extra-ldflags="-L$TARGET_DIR/lib -lm -static" \
+	--extra-version=static \
+	--disable-debug \
+	--disable-shared \
+	--enable-static \
+	--disable-ffplay \
+	--disable-ffserver \
+	--disable-doc \
+	--disable-devices \
+	--enable-gpl \
+	--enable-nonfree \
+	--enable-version3 \
+	--enable-pthreads \
+	--enable-postproc \
+	--enable-gray \
+	--enable-runtime-cpudetect \
+	--enable-libfaac \
+	--enable-libmp3lame \
+	--enable-libopencore-amrnb \
+	--enable-libopencore-amrwb \
+	--enable-libopus \
+	--enable-libtheora \
+	--enable-libvorbis \
+	--enable-libx264 \
+	--enable-libxvid \
+	--enable-bzlib \
+	--enable-zlib \
+	--enable-libvpx
+
 make -j $jval && make install
