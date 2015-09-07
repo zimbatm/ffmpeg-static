@@ -29,16 +29,6 @@ sub localmirrors {
 		}
 		close LM;
 	};
-	open CONFIG, "<".$ENV{'TOPDIR'}."/.config" and do {
-		while (<CONFIG>) {
-			/^CONFIG_LOCALMIRROR="(.+)"/ and do {
-				chomp;
-				my @local_mirrors = split(/;/, $1);
-				push @mlist, @local_mirrors;
-			};
-		}
-		close CONFIG;
-	};
 
 	my $mirror = $ENV{'DOWNLOAD_MIRROR'};
 	$mirror and push @mlist, split(/;/, $mirror);
@@ -106,6 +96,16 @@ sub download
 			return;
 		}
 	} else {
+		if (-e "$target/$filename") {
+			my $filesum = `$md5cmd "$target/$filename"`;
+			$filesum =~ /^(\w+)\s*/ or die "Could not get md5sum\n";
+			$filesum = $1;
+			if (($filesum =~ /\w{32}/) and ($filesum ne $md5sum)) {
+				print STDERR "MD5 sum of the downloaded file does not match (file: $filesum, requested: $md5sum) - redownload.\n";
+			} else {
+				return;
+			}
+		}
 		open WGET, "wget -t5 --timeout=20 --no-check-certificate $options -O- '$mirror/$filename' |" or die "Cannot launch wget.\n";
 		open MD5SUM, "| $md5cmd > '$target/$filename.md5sum'" or die "Cannot launch md5sum.\n";
 		open OUTPUT, "> $target/$filename.dl" or die "Cannot create file $target/$filename.dl: $!\n";
