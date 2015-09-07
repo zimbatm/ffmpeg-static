@@ -11,10 +11,11 @@ use warnings;
 use File::Basename;
 use File::Copy;
 
-@ARGV > 2 or die "Syntax: $0 <target dir> <filename> <md5sum> [<mirror> ...]\n";
+@ARGV > 2 or die "Syntax: $0 <target dir> <filename> <aliasname> <md5sum> [<mirror> ...]\n";
 
 my $target = shift @ARGV;
 my $filename = shift @ARGV;
+my $aliasname = shift @ARGV;
 my $md5sum = shift @ARGV;
 my $scriptdir = dirname($0);
 my @mirrors;
@@ -66,8 +67,8 @@ sub download
 			system("mkdir", "-p", "$target/");
 		}
 
-		if (! open TMPDLS, "find $mirror -follow -name $filename 2>/dev/null |") {
-			print("Failed to search for $filename in $mirror\n");
+		if (! open TMPDLS, "find $mirror -follow -name $aliasname 2>/dev/null |") {
+			print("Failed to search for $aliasname in $mirror\n");
 			return;
 		}
 
@@ -76,7 +77,7 @@ sub download
 		while (defined(my $line = readline TMPDLS)) {
 			chomp ($link = $line);
 			if ($. > 1) {
-				print("$. or more instances of $filename in $mirror found . Only one instance allowed.\n");
+				print("$. or more instances of $aliasname in $mirror found . Only one instance allowed.\n");
 				return;
 			}
 		}
@@ -84,20 +85,20 @@ sub download
 		close TMPDLS;
 
 		if (! $link) {
-			print("No instances of $filename found in $mirror.\n");
+			print("No instances of $aliasname found in $mirror.\n");
 			return;
 		}
 
-		print("Copying $filename from $link\n");
-		copy($link, "$target/$filename.dl");
+		print("Copying $aliasname from $link\n");
+		copy($link, "$target/$aliasname.dl");
 
-		if (system("$md5cmd '$target/$filename.dl' > '$target/$filename.md5sum'")) {
-			print("Failed to generate md5 sum for $filename\n");
+		if (system("$md5cmd '$target/$aliasname.dl' > '$target/$aliasname.md5sum'")) {
+			print("Failed to generate md5 sum for $aliasname\n");
 			return;
 		}
 	} else {
-		if (-e "$target/$filename") {
-			my $filesum = `$md5cmd "$target/$filename"`;
+		if (-e "$target/$aliasname") {
+			my $filesum = `$md5cmd "$target/$aliasname"`;
 			$filesum =~ /^(\w+)\s*/ or die "Could not get md5sum\n";
 			$filesum = $1;
 			if (($filesum =~ /\w{32}/) and ($filesum ne $md5sum)) {
@@ -107,8 +108,8 @@ sub download
 			}
 		}
 		open WGET, "wget -t5 --timeout=20 --no-check-certificate $options -O- '$mirror/$filename' |" or die "Cannot launch wget.\n";
-		open MD5SUM, "| $md5cmd > '$target/$filename.md5sum'" or die "Cannot launch md5sum.\n";
-		open OUTPUT, "> $target/$filename.dl" or die "Cannot create file $target/$filename.dl: $!\n";
+		open MD5SUM, "| $md5cmd > '$target/$aliasname.md5sum'" or die "Cannot launch md5sum.\n";
+		open OUTPUT, "> $target/$aliasname.dl" or die "Cannot create file $target/$aliasname.dl: $!\n";
 		my $buffer;
 		while (read WGET, $buffer, 1048576) {
 			print MD5SUM $buffer;
@@ -125,7 +126,7 @@ sub download
 		}
 	}
 
-	my $sum = `cat "$target/$filename.md5sum"`;
+	my $sum = `cat "$target/$aliasname.md5sum"`;
 	$sum =~ /^(\w+)\s*/ or die "Could not generate md5sum\n";
 	$sum = $1;
 
@@ -135,15 +136,15 @@ sub download
 		return;
 	}
 
-	unlink "$target/$filename";
-	system("mv", "$target/$filename.dl", "$target/$filename");
+	unlink "$target/$aliasname";
+	system("mv", "$target/$aliasname.dl", "$target/$aliasname");
 	cleanup();
 }
 
 sub cleanup
 {
-	unlink "$target/$filename.dl";
-	unlink "$target/$filename.md5sum";
+	unlink "$target/$aliasname.dl";
+	unlink "$target/$aliasname.md5sum";
 }
 
 @mirrors = localmirrors();
@@ -167,9 +168,9 @@ foreach my $mirror (@ARGV) {
 		push @mirrors, "http://download-mirror.savannah.gnu.org/releases/$1";
 	} elsif ($mirror =~ /^\@KERNEL\/(.+)$/) {
 		my @extra = ( $1 );
-		if ($filename =~ /linux-\d+\.\d+(?:\.\d+)?-rc/) {
+		if ($aliasname =~ /linux-\d+\.\d+(?:\.\d+)?-rc/) {
 			push @extra, "$extra[0]/testing";
-		} elsif ($filename =~ /linux-(\d+\.\d+(?:\.\d+)?)/) {
+		} elsif ($$aliasname =~ /linux-(\d+\.\d+(?:\.\d+)?)/) {
 			push @extra, "$extra[0]/longterm/v$1";
 		}		
 		foreach my $dir (@extra) {
@@ -204,7 +205,7 @@ while (!$ok) {
 	$mirror or die "No more mirrors to try - giving up.\n";
 
 	download($mirror);
-	-f "$target/$filename" and $ok = 1;
+	-f "$target/$aliasname" and $ok = 1;
 }
 
 $SIG{INT} = \&cleanup;
