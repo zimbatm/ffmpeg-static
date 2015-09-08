@@ -31,118 +31,143 @@ cd `dirname $0`
 ENV_ROOT=`pwd`
 . ./env.source
 
-rm -rf "$BUILD_DIR" "$TARGET_DIR"
-mkdir -p "$BUILD_DIR" "$TARGET_DIR"
+#if you want a rebuild
+#rm -rf "$BUILD_DIR" "$TARGET_DIR"
+mkdir -p "$BUILD_DIR" "$TARGET_DIR" "$DOWNLOAD_DIR" "$BIN_DIR"
 
-# NOTE: this is a fetchurl parameter, nothing to do with the current script
-#export TARGET_DIR_DIR="$BUILD_DIR"
+#download and extract package
+download(){
+filename="$1"
+if [ ! -z "$2" ];then
+	filename="$2"
+fi
+../download.pl "$DOWNLOAD_DIR" "$1" "$filename" "$3" "$4"
+#disable uncompress
+CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
+}
 
-echo "#### FFmpeg static build, by STVS SA ####"
+echo "#### FFmpeg static build ####"
+
+#this is our working directory
 cd $BUILD_DIR
-../fetchurl "http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz"
-../fetchurl "http://zlib.net/zlib-1.2.8.tar.gz"
-../fetchurl "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
-../fetchurl "http://downloads.sf.net/project/libpng/libpng15/older-releases/1.5.14/libpng-1.5.14.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.4.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
-../fetchurl "http://webm.googlecode.com/files/libvpx-v1.3.0.tar.bz2"
-../fetchurl "http://downloads.sourceforge.net/project/faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
-../fetchurl "ftp://ftp.videolan.org/pub/x264/snapshots/last_x264.tar.bz2"
-../fetchurl "http://downloads.xvid.org/downloads/xvidcore-1.3.3.tar.gz"
-../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
-../fetchurl "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
-../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-2.3.3.tar.bz2"
+
+download \
+	"yasm-1.3.0.tar.gz" \
+	"" \
+	"fc9e586751ff789b34b1f21d572d96af" \
+	"http://www.tortall.net/projects/yasm/releases/"
+
+download \
+	"last_x264.tar.bz2" \
+	"" \
+	"2b712f196293bd04f4241e4f218e102d" \
+	"http://download.videolan.org/pub/x264/snapshots/"
+
+download \
+	"x265_1.7.tar.gz" \
+	"" \
+	"ff31a807ebc868aa59b60706e303102f" \
+	"https://bitbucket.org/multicoreware/x265/downloads/"
+
+download \
+	"master" \
+	"fdk-aac.tar.gz" \
+	"e6a0df5ba4b2343edaf4c05ed5925de9" \
+	"https://github.com/mstorsjo/fdk-aac/tarball"
+
+download \
+	"lame-3.99.5.tar.gz" \
+	"" \
+	"84835b313d4a8b68f5349816d33e07ce" \
+	"http://downloads.sourceforge.net/project/lame/lame/3.99"
+
+download \
+	"opus-1.1.tar.gz" \
+	"" \
+	"c5a8cf7c0b066759542bc4ca46817ac6" \
+	"http://downloads.xiph.org/releases/opus"
+
+download \
+	"libvpx-1.4.0.tar.bz2" \
+	"" \
+	"63b1d7f59636a42eeeee9225cc14e7de" \
+	"http://ftp.osuosl.org/pub/blfs/svn/l"
+
+download \
+	"2.8.tar.gz" \
+	"ffmpeg2.8.tar.gz" \
+	"984465afafb8db41d8fe80e9a56a0ffb" \
+	"https://github.com/FFmpeg/FFmpeg/archive/release"
 
 echo "*** Building yasm ***"
 cd $BUILD_DIR/yasm*
-./configure --prefix=$TARGET_DIR
-make -j $jval
-make install
-
-echo "*** Building zlib ***"
-cd $BUILD_DIR/zlib*
-./configure --prefix=$TARGET_DIR
-make -j $jval
-make install
-
-echo "*** Building bzip2 ***"
-cd $BUILD_DIR/bzip2*
-make
-make install PREFIX=$TARGET_DIR
-
-echo "*** Building libpng ***"
-cd $BUILD_DIR/libpng*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
-make install
-
-# Ogg before vorbis
-echo "*** Building libogg ***"
-cd $BUILD_DIR/libogg*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
-make install
-
-# Vorbis before theora
-echo "*** Building libvorbis ***"
-cd $BUILD_DIR/libvorbis*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
-make install
-
-echo "*** Building libtheora ***"
-cd $BUILD_DIR/libtheora*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
-make install
-
-echo "*** Building livpx ***"
-cd $BUILD_DIR/libvpx*
-./configure --prefix=$TARGET_DIR --disable-shared
-make -j $jval
-make install
-
-echo "*** Building faac ***"
-cd $BUILD_DIR/faac*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-# FIXME: gcc incompatibility, does not work with log()
-
-sed -i -e "s|^char \*strcasestr.*|//\0|" common/mp4v2/mpeg4ip.h
+./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
 make -j $jval
 make install
 
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
+PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo "*** Building x265 ***"
+cd $BUILD_DIR/x265*
+cd build/linux
+PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:bool=off ../../source
 make -j $jval
 make install
 
-echo "*** Building xvidcore ***"
-cd "$BUILD_DIR/xvidcore/build/generic"
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+echo "*** Building fdk-aac ***"
+cd $BUILD_DIR/mstorsjo-fdk-aac*
+autoreconf -fiv
+./configure --prefix=$TARGET_DIR --disable-shared
 make -j $jval
 make install
-#rm $TARGET_DIR/lib/libxvidcore.so.*
 
-echo "*** Building lame ***"
+echo "*** Building mp3lame ***"
 cd $BUILD_DIR/lame*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
+./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared
+make
 make install
 
 echo "*** Building opus ***"
 cd $BUILD_DIR/opus*
-./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
+./configure --prefix=$TARGET_DIR --disable-shared
+make
 make install
 
-# FIXME: only OS-specific
-rm -f "$TARGET_DIR/lib/*.dylib"
-rm -f "$TARGET_DIR/lib/*.so"
+echo "*** Building libvpx ***"
+cd $BUILD_DIR/libvpx*
+PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
 
 # FFMpeg
 echo "*** Building FFmpeg ***"
-cd $BUILD_DIR/ffmpeg*
-CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-cflags="-I$TARGET_DIR/include -static" --extra-ldflags="-L$TARGET_DIR/lib -lm -static" --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
-make -j $jval && make install
+cd $BUILD_DIR/FFmpeg*
+PATH="$BIN_DIR:$PATH" \
+PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
+  --prefix="$TARGET_DIR" \
+  --pkg-config-flags="--static" \
+  --extra-cflags="-I$TARGET_DIR/include" \
+  --extra-ldflags="-L$TARGET_DIR/lib" \
+  --bindir="$BIN_DIR" \
+  --enable-ffplay \
+  --enable-ffserver \
+  --enable-gpl \
+  --enable-libass \
+  --enable-libfdk-aac \
+  --enable-libfreetype \
+  --enable-libmp3lame \
+  --enable-libopus \
+  --enable-libtheora \
+  --enable-libvorbis \
+  --enable-libvpx \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-nonfree
+PATH="$BIN_DIR:$PATH" make
+make install
+make distclean
+hash -r
