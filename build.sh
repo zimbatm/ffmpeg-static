@@ -42,7 +42,7 @@ if [ ! -z "$2" ];then
 	filename="$2"
 fi
 ../download.pl "$DOWNLOAD_DIR" "$1" "$filename" "$3" "$4"
-disable uncompress
+#disable uncompress
 CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
 }
 
