@@ -60,7 +60,7 @@ download \
 download \
 	"last_x264.tar.bz2" \
 	"" \
-	"2b712f196293bd04f4241e4f218e102d" \
+	"92d576f786ff7e42894e39076fb032c6" \
 	"http://download.videolan.org/pub/x264/snapshots/"
 
 download \
@@ -72,7 +72,7 @@ download \
 download \
 	"master" \
 	"fdk-aac.tar.gz" \
-	"e6a0df5ba4b2343edaf4c05ed5925de9" \
+	"4c6cd99146dbe9f624da7e9d8ee72a46" \
 	"https://github.com/mstorsjo/fdk-aac/tarball"
 
 download \
@@ -88,15 +88,15 @@ download \
 	"http://downloads.xiph.org/releases/opus"
 
 download \
-	"libvpx-1.4.0.tar.bz2" \
+	"v1.5.0.tar.gz" \
 	"" \
-	"63b1d7f59636a42eeeee9225cc14e7de" \
-	"http://ftp.osuosl.org/pub/blfs/svn/l"
+	"0c662bc7525afe281badb3175140d35c" \
+	"https://github.com/webmproject/libvpx/archive/"
 
 download \
 	"2.8.tar.gz" \
 	"ffmpeg2.8.tar.gz" \
-	"984465afafb8db41d8fe80e9a56a0ffb" \
+	"cb4f1da8ccd91eda618a4d4cd95ca36e" \
 	"https://github.com/FFmpeg/FFmpeg/archive/release"
 
 echo "*** Building yasm ***"
