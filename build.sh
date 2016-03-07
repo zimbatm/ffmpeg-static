@@ -60,8 +60,8 @@ download \
 download \
 	"last_x264.tar.bz2" \
 	"" \
-	"92d576f786ff7e42894e39076fb032c6" \
-	"http://download.videolan.org/pub/x264/snapshots/"
+	"fc85380e1c49426c680e154c3ddac7d3saf" \
+	"http://download.videolan.org/pub/videolan/x264/snapshots/"
 
 download \
 	"x265_1.7.tar.gz" \
