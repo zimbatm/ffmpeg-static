@@ -14,10 +14,10 @@ Build dependencies
     # Debian & Ubuntu
     $ apt-get install build-essential curl tar
 
-	# OS X
-	# install XCode, it can be found at http://developer.apple.com/
-	# (apple login needed)
-	# <FIXME???>
+    # OS X
+    # install XCode, it can be found at http://developer.apple.com/
+    # (apple login needed)
+    # <FIXME???>
 
 Build & "install"
 -----------------
@@ -36,13 +36,13 @@ Debug
 
 On the top-level of the project, run:
 
-	$ . env.source
-	
+    $ . env.source
+    
 You can then enter the source folders and make the compilation yourself
 
-	$ cd build/ffmpeg-*
-	$ ./configure --prefix=$TARGET_DIR #...
-	# ...
+    $ cd build/ffmpeg-*
+    $ ./configure --prefix=$TARGET_DIR #...
+    # ...
 
 Remaining links
 ---------------
@@ -52,12 +52,12 @@ means the executable won't work across distributions or even across releases.
 
     # On Ubuntu 10.04:
     $ ldd ./target/bin/ffmpeg 
-	not a dynamic executable
+    not a dynamic executable
 
     # on OSX 10.6.4:
     $ otool -L ffmpeg 
-	ffmpeg:
-		/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 125.2.0)
+    ffmpeg:
+        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 125.2.0)
 
 Community, bugs and reports
 ---------------------------

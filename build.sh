@@ -9,12 +9,12 @@ jval=2
 while getopts 'j:' OPTION
 do
   case $OPTION in
-  j)	jflag=1
-        	jval="$OPTARG"
-	        ;;
-  ?)	printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%)\n" $(basename $0) >&2
-		exit 2
-		;;
+  j)  jflag=1
+          jval="$OPTARG"
+          ;;
+  ?)  printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%)\n" $(basename $0) >&2
+    exit 2
+    ;;
   esac
 done
 shift $(($OPTIND - 1))
@@ -37,13 +37,13 @@ mkdir -p "$BUILD_DIR" "$TARGET_DIR" "$DOWNLOAD_DIR" "$BIN_DIR"
 
 #download and extract package
 download(){
-filename="$1"
-if [ ! -z "$2" ];then
-	filename="$2"
-fi
-../download.pl "$DOWNLOAD_DIR" "$1" "$filename" "$3" "$4"
-#disable uncompress
-CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
+  filename="$1"
+  if [ ! -z "$2" ];then
+    filename="$2"
+  fi
+  ../download.pl "$DOWNLOAD_DIR" "$1" "$filename" "$3" "$4"
+  #disable uncompress
+  CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
 }
 
 echo "#### FFmpeg static build ####"
@@ -52,52 +52,52 @@ echo "#### FFmpeg static build ####"
 cd $BUILD_DIR
 
 download \
-	"yasm-1.3.0.tar.gz" \
-	"" \
-	"fc9e586751ff789b34b1f21d572d96af" \
-	"http://www.tortall.net/projects/yasm/releases/"
+  "yasm-1.3.0.tar.gz" \
+  "" \
+  "fc9e586751ff789b34b1f21d572d96af" \
+  "http://www.tortall.net/projects/yasm/releases/"
 
 download \
-	"last_x264.tar.bz2" \
-	"" \
-	"fc85380e1c49426c680e154c3ddac7d3saf" \
-	"http://download.videolan.org/pub/videolan/x264/snapshots/"
+  "last_x264.tar.bz2" \
+  "" \
+  "fc85380e1c49426c680e154c3ddac7d3saf" \
+  "http://download.videolan.org/pub/videolan/x264/snapshots/"
 
 download \
-	"x265_1.7.tar.gz" \
-	"" \
-	"ff31a807ebc868aa59b60706e303102f" \
-	"https://bitbucket.org/multicoreware/x265/downloads/"
+  "x265_1.7.tar.gz" \
+  "" \
+  "ff31a807ebc868aa59b60706e303102f" \
+  "https://bitbucket.org/multicoreware/x265/downloads/"
 
 download \
-	"master" \
-	"fdk-aac.tar.gz" \
-	"4c6cd99146dbe9f624da7e9d8ee72a46" \
-	"https://github.com/mstorsjo/fdk-aac/tarball"
+  "master" \
+  "fdk-aac.tar.gz" \
+  "4c6cd99146dbe9f624da7e9d8ee72a46" \
+  "https://github.com/mstorsjo/fdk-aac/tarball"
 
 download \
-	"lame-3.99.5.tar.gz" \
-	"" \
-	"84835b313d4a8b68f5349816d33e07ce" \
-	"http://downloads.sourceforge.net/project/lame/lame/3.99"
+  "lame-3.99.5.tar.gz" \
+  "" \
+  "84835b313d4a8b68f5349816d33e07ce" \
+  "http://downloads.sourceforge.net/project/lame/lame/3.99"
 
 download \
-	"opus-1.1.tar.gz" \
-	"" \
-	"c5a8cf7c0b066759542bc4ca46817ac6" \
-	"http://downloads.xiph.org/releases/opus"
+  "opus-1.1.tar.gz" \
+  "" \
+  "c5a8cf7c0b066759542bc4ca46817ac6" \
+  "http://downloads.xiph.org/releases/opus"
 
 download \
-	"v1.5.0.tar.gz" \
-	"" \
-	"0c662bc7525afe281badb3175140d35c" \
-	"https://github.com/webmproject/libvpx/archive/"
+  "v1.5.0.tar.gz" \
+  "" \
+  "0c662bc7525afe281badb3175140d35c" \
+  "https://github.com/webmproject/libvpx/archive/"
 
 download \
-	"2.8.tar.gz" \
-	"ffmpeg2.8.tar.gz" \
-	"cb4f1da8ccd91eda618a4d4cd95ca36e" \
-	"https://github.com/FFmpeg/FFmpeg/archive/release"
+  "2.8.tar.gz" \
+  "ffmpeg2.8.tar.gz" \
+  "cb4f1da8ccd91eda618a4d4cd95ca36e" \
+  "https://github.com/FFmpeg/FFmpeg/archive/release"
 
 echo "*** Building yasm ***"
 cd $BUILD_DIR/yasm*

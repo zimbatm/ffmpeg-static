@@ -39,10 +39,10 @@ sh () {
 }
 
 expand_path() {
-	here=`pwd`
-	cd $1
-	echo `pwd -P`
-	cd "$here"
+  here=`pwd`
+  cd $1
+  echo `pwd -P`
+  cd "$here"
 }
 
 usage() {
