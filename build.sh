@@ -167,7 +167,7 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --enable-libx264 \
   --enable-libx265 \
   --enable-nonfree
-PATH="$BIN_DIR:$PATH" make
+PATH="$BIN_DIR:$PATH" make -j`nproc`
 make install
 make distclean
 hash -r
