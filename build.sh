@@ -60,19 +60,19 @@ download \
 download \
   "last_x264.tar.bz2" \
   "" \
-  "fc85380e1c49426c680e154c3ddac7d3saf" \
+  "nil" \
   "http://download.videolan.org/pub/videolan/x264/snapshots/"
 
 download \
   "x265_1.7.tar.gz" \
   "" \
-  "ff31a807ebc868aa59b60706e303102f" \
+  "nil" \
   "https://bitbucket.org/multicoreware/x265/downloads/"
 
 download \
   "master" \
   "fdk-aac.tar.gz" \
-  "4c6cd99146dbe9f624da7e9d8ee72a46" \
+  "nil" \
   "https://github.com/mstorsjo/fdk-aac/tarball"
 
 download \
@@ -96,7 +96,7 @@ download \
 download \
   "2.8.tar.gz" \
   "ffmpeg2.8.tar.gz" \
-  "cb4f1da8ccd91eda618a4d4cd95ca36e" \
+  "nil" \
   "https://github.com/FFmpeg/FFmpeg/archive/release"
 
 echo "*** Building yasm ***"
