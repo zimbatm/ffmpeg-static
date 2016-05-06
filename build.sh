@@ -143,6 +143,13 @@ PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disa
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
+NPROC=1
+if which `nproc`;then
+	NPROC="`nproc`"
+elif [ -f /proc/cpuinfo ];then
+	NPROC="`grep -c ^processor /proc/cpuinfo`"
+fi
+
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
@@ -167,7 +174,7 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --enable-libx264 \
   --enable-libx265 \
   --enable-nonfree
-PATH="$BIN_DIR:$PATH" make -j`nproc`
+PATH="$BIN_DIR:$PATH" make -j$NPROC
 make install
 make distclean
 hash -r
