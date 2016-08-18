@@ -78,6 +78,11 @@ beforehand.
  * OSX's xvidcore does not detect yasm correctly
  * remove remaining libs (?)
 
+Related projects
+----------------
+
+* FFmpeg Static Builds - http://johnvansickle.com/ffmpeg/
+
 License
 -------
 
