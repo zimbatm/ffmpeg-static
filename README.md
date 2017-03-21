@@ -12,7 +12,7 @@ Build dependencies
 ------------------
 
     # Debian & Ubuntu
-    $ apt-get install build-essential curl tar
+    $ apt-get install build-essential curl tar libass-dev libtheora-dev libvorbis-dev libtool
 
     # OS X
     # install XCode, it can be found at http://developer.apple.com/
@@ -22,9 +22,13 @@ Build dependencies
 Build & "install"
 -----------------
 
-    $ ./build.sh or build-ubuntu.sh
+    $ ./build.sh [-j <jobs>]
     # ... wait ...
     # binaries can be found in ./target/bin/
+
+Ubuntu users can download dependencies and and install in one command:
+
+    $ sudo ./build-ubuntu.sh
 
 NOTE: If you're going to use the h264 presets, make sure to copy them along the binaries. For ease, you can put them in your home folder like this:
 
