@@ -22,13 +22,15 @@ Build dependencies
 Build & "install"
 -----------------
 
-    $ ./build.sh [-j <jobs>]
+    $ ./build.sh [-j <jobs>] [-B]
     # ... wait ...
     # binaries can be found in ./target/bin/
 
 Ubuntu users can download dependencies and and install in one command:
 
     $ sudo ./build-ubuntu.sh
+
+If you have built ffmpeg before with `build.sh`, the default behaviour is to keep the previous configuration. If you would like to reconfigure and rebuild all packages, use the `-B` flag. 
 
 NOTE: If you're going to use the h264 presets, make sure to copy them along the binaries. For ease, you can put them in your home folder like this:
 
