@@ -6,6 +6,7 @@ set -u
 jflag=
 jval=2
 rebuild=0
+uname -mpi | grep -qE 'x86|i386|i686' && is_x86=1 || is_x86=0
 
 while getopts 'j:B' OPTION
 do
@@ -34,6 +35,7 @@ then
 fi
 
 [ "$rebuild" -eq 1 ] && echo "Reconfiguring existing packages..."
+[ $is_x86 -ne 1 ] && echo "Not using yasm on non-x86 platform..."
 
 cd `dirname $0`
 ENV_ROOT=`pwd`
@@ -59,7 +61,7 @@ echo "#### FFmpeg static build ####"
 #this is our working directory
 cd $BUILD_DIR
 
-download \
+[ $is_x86 -eq 1 ] && download \
   "yasm-1.3.0.tar.gz" \
   "" \
   "fc9e586751ff789b34b1f21d572d96af" \
@@ -107,11 +109,13 @@ download \
   "nil" \
   "https://github.com/FFmpeg/FFmpeg/archive/release"
 
-echo "*** Building yasm ***"
-cd $BUILD_DIR/yasm*
-[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
-make -j $jval
-make install
+if [ $is_x86 -eq 1 ]; then
+    echo "*** Building yasm ***"
+    cd $BUILD_DIR/yasm*
+    [ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
+    make -j $jval
+    make install
+fi
 
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
