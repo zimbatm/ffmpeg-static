@@ -5,16 +5,22 @@ set -u
 
 jflag=
 jval=2
+rebuild=0
 
-while getopts 'j:' OPTION
+while getopts 'j:B' OPTION
 do
   case $OPTION in
-  j)  jflag=1
-          jval="$OPTARG"
-          ;;
-  ?)  printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%)\n" $(basename $0) >&2
-    exit 2
-    ;;
+  j)
+      jflag=1
+      jval="$OPTARG"
+      ;;
+  B)
+      rebuild=1
+      ;;
+  ?)
+      printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%) [-B]\n" $(basename $0) >&2
+      exit 2
+      ;;
   esac
 done
 shift $(($OPTIND - 1))
@@ -26,6 +32,8 @@ then
     printf "Option -j specified (%d)\n" $jval
   fi
 fi
+
+[ "$rebuild" -eq 1 ] && echo "Reconfiguring existing packages..."
 
 cd `dirname $0`
 ENV_ROOT=`pwd`
@@ -43,7 +51,7 @@ download(){
   fi
   ../download.pl "$DOWNLOAD_DIR" "$1" "$filename" "$3" "$4"
   #disable uncompress
-  CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
+  REPLACE="$rebuild" CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
 }
 
 echo "#### FFmpeg static build ####"
@@ -101,13 +109,13 @@ download \
 
 echo "*** Building yasm ***"
 cd $BUILD_DIR/yasm*
-./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
+[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
 make -j $jval
 make install
 
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
-PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
+[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
@@ -121,7 +129,7 @@ make install
 echo "*** Building fdk-aac ***"
 cd $BUILD_DIR/mstorsjo-fdk-aac*
 autoreconf -fiv
-./configure --prefix=$TARGET_DIR --disable-shared
+[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
 make -j $jval
 make install
 
@@ -131,19 +139,19 @@ if uname -a | grep -q 'aarch64'; then
     # The lame build script does not recognize aarch64, so need to set it manually
     lame_build_target="--build=arm-linux"
 fi
-./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
+[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
 make
 make install
 
 echo "*** Building opus ***"
 cd $BUILD_DIR/opus*
-./configure --prefix=$TARGET_DIR --disable-shared
+[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
 make
 make install
 
 echo "*** Building libvpx ***"
 cd $BUILD_DIR/libvpx*
-PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests
+[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
@@ -158,7 +166,7 @@ fi
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
 PATH="$BIN_DIR:$PATH" \
-PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
+[ $rebuild -eq 1 -o ! -f config.status ] && PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --prefix="$TARGET_DIR" \
   --pkg-config-flags="--static" \
   --extra-cflags="-I$TARGET_DIR/include" \
@@ -182,3 +190,4 @@ PATH="$BIN_DIR:$PATH" make -j$NPROC
 make install
 make distclean
 hash -r
+

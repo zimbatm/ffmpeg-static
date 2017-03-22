@@ -49,6 +49,7 @@ usage() {
   echo "Usage: fetchurl url"
   echo "CACHE=${CACHE}"
   echo "UNPACK=${UNPACK}"
+  echo "REPLACE=${REPLACE}"
   echo "VERBOSE=${VERBOSE}"
 
   echo "EXTRACT_DIR=${EXTRACT_DIR}"
@@ -101,13 +102,14 @@ if [ "$UNPACK" -ne 0 ]; then
   target_dir=`expand_path "$EXTRACT_DIR"`
   mkdir -p "$target_dir"
   sh cd "$target_dir"
-  
+ 
+  [ "$REPLACE" -ne 1 ] && tarargs="--keep-old-files --no-overwrite-dir" || tarargs=""
   case "$extname" in
     .tar.gz|.tgz)    
-      sh tar xzvf "$cache_file"
+      sh tar "$tarargs" -xzvf "$cache_file"
     ;;
     .tar.bz2)
-      sh tar xjvf "$cache_file"
+      sh tar "$tarargs" -xjvf "$cache_file"
     ;;
     *)
       stderr BUG, this should not happen
