@@ -169,8 +169,8 @@ fi
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
-PATH="$BIN_DIR:$PATH" \
-[ $rebuild -eq 1 -o ! -f config.status ] && PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
+[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
+PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --prefix="$TARGET_DIR" \
   --pkg-config-flags="--static" \
   --extra-cflags="-I$TARGET_DIR/include" \
