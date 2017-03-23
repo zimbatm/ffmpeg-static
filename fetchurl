@@ -103,7 +103,7 @@ if [ "$UNPACK" -ne 0 ]; then
   mkdir -p "$target_dir"
   sh cd "$target_dir"
  
-  [ "$REPLACE" -ne 1 ] && tarargs="--keep-old-files --no-overwrite-dir" || tarargs=""
+  [ "$REPLACE" -ne 1 ] && tarargs="--skip-old-files" || tarargs=""
   case "$extname" in
     .tar.gz|.tgz)    
       sh tar "$tarargs" -xzvf "$cache_file"
