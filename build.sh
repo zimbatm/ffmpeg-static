@@ -139,10 +139,8 @@ make install
 
 echo "*** Building mp3lame ***"
 cd $BUILD_DIR/lame*
-if uname -a | grep -q 'aarch64'; then
-    # The lame build script does not recognize aarch64, so need to set it manually
-    lame_build_target="--build=arm-linux"
-fi
+# The lame build script does not recognize aarch64, so need to set it manually
+uname -a | grep -q 'aarch64' && lame_build_target="--build=arm-linux" || lame_build_target=''
 [ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
 make
 make install
