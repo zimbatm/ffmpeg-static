@@ -12,7 +12,7 @@ Build dependencies
 ------------------
 
     # Debian & Ubuntu
-    $ apt-get install build-essential curl tar libass-dev libtheora-dev libvorbis-dev libtool
+    $ apt-get install build-essential curl tar libass-dev libtheora-dev libvorbis-dev libtool cmake automake autoconf
 
     # OS X
     # install XCode, it can be found at http://developer.apple.com/

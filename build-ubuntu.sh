@@ -5,6 +5,7 @@ sudo apt-get -y --force-yes install \
   autoconf \
   automake \
   build-essential \
+  cmake \
   libass-dev \
   libfreetype6-dev \
   libsdl1.2-dev \

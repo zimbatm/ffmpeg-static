@@ -74,9 +74,9 @@ download \
   "http://download.videolan.org/pub/videolan/x264/snapshots/"
 
 download \
-  "x265_1.7.tar.gz" \
+  "x265_2.3.tar.gz" \
   "" \
-  "nil" \
+  "18716a7e0c6f6ebd2a1035b82cec30de" \
   "https://bitbucket.org/multicoreware/x265/downloads/"
 
 download \
@@ -92,22 +92,22 @@ download \
   "http://downloads.sourceforge.net/project/lame/lame/3.99"
 
 download \
-  "opus-1.1.tar.gz" \
+  "opus-1.1.2.tar.gz" \
   "" \
-  "c5a8cf7c0b066759542bc4ca46817ac6" \
-  "http://downloads.xiph.org/releases/opus"
+  "1f08a661bc72930187893a07f3741a91" \
+  "https://github.com/xiph/opus/releases/download/v1.1.2"
 
 download \
-  "v1.5.0.tar.gz" \
-  "" \
-  "0c662bc7525afe281badb3175140d35c" \
-  "https://github.com/webmproject/libvpx/archive/"
+  "v1.6.1.tar.gz" \
+  "vpx-1.6.1.tar.gz" \
+  "b0925c8266e2859311860db5d76d1671" \
+  "https://github.com/webmproject/libvpx/archive"
 
 download \
-  "2.8.tar.gz" \
-  "ffmpeg2.8.tar.gz" \
-  "nil" \
-  "https://github.com/FFmpeg/FFmpeg/archive/release"
+  "n3.2.4.tar.gz" \
+  "ffmpeg3.2.4.tar.gz" \
+  "8ca58121dd042153656d89eba3daa7ab" \
+  "https://github.com/FFmpeg/FFmpeg/archive"
 
 if [ $is_x86 -eq 1 ]; then
     echo "*** Building yasm ***"
@@ -119,7 +119,7 @@ fi
 
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
-[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl
+[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl --enable-pic
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
@@ -153,7 +153,7 @@ make install
 
 echo "*** Building libvpx ***"
 cd $BUILD_DIR/libvpx*
-[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests
+[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests --enable-pic
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
@@ -174,6 +174,7 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --extra-cflags="-I$TARGET_DIR/include" \
   --extra-ldflags="-L$TARGET_DIR/lib" \
   --bindir="$BIN_DIR" \
+  --enable-pic \
   --enable-ffplay \
   --enable-ffserver \
   --enable-gpl \
