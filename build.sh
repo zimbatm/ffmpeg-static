@@ -112,28 +112,32 @@ download \
 if [ $is_x86 -eq 1 ]; then
     echo "*** Building yasm ***"
     cd $BUILD_DIR/yasm*
-    [ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
+    [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+    [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
     make -j $jval
     make install
 fi
 
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
-[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl --enable-pic
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --disable-opencl --enable-pic
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
 echo "*** Building x265 ***"
 cd $BUILD_DIR/x265*
 cd build/linux
+[ $rebuild -eq 1 ] && find . -mindepth 1 ! -name 'make-Makefiles.bash' -and ! -name 'multilib.sh' -exec rm -r {} +
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:bool=off ../../source
 make -j $jval
 make install
 
 echo "*** Building fdk-aac ***"
 cd $BUILD_DIR/mstorsjo-fdk-aac*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 autoreconf -fiv
-[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
+[ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
 make -j $jval
 make install
 
@@ -141,19 +145,22 @@ echo "*** Building mp3lame ***"
 cd $BUILD_DIR/lame*
 # The lame build script does not recognize aarch64, so need to set it manually
 uname -a | grep -q 'aarch64' && lame_build_target="--build=arm-linux" || lame_build_target=''
-[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+[ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
 make
 make install
 
 echo "*** Building opus ***"
 cd $BUILD_DIR/opus*
-[ $rebuild -eq 1 -o ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+[ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
 make
 make install
 
 echo "*** Building libvpx ***"
 cd $BUILD_DIR/libvpx*
-[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests --enable-pic
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-examples --disable-unit-tests --enable-pic
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
@@ -167,7 +174,8 @@ fi
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
-[ $rebuild -eq 1 -o ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
 PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --prefix="$TARGET_DIR" \
   --pkg-config-flags="--static" \
