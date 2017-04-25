@@ -85,6 +85,25 @@ download \
   "nil" \
   "https://github.com/mstorsjo/fdk-aac/tarball"
 
+# libass dependency
+download \
+  "harfbuzz-1.4.6.tar.bz2" \
+  "" \
+  "e246c08a3bac98e31e731b2a1bf97edf" \
+  "https://www.freedesktop.org/software/harfbuzz/release/"
+
+download \
+  "fribidi-0.19.7.tar.bz2" \
+  "" \
+  "6c7e7cfdd39c908f7ac619351c1c5c23" \
+  "https://www.fribidi.org/download/"
+
+download \
+  "0.13.6.tar.gz" \
+  "libass-0.13.6.tar.gz" \
+  "nil" \
+  "https://github.com/libass/libass/archive/"
+
 download \
   "lame-3.99.5.tar.gz" \
   "" \
@@ -141,6 +160,28 @@ autoreconf -fiv
 make -j $jval
 make install
 
+echo "*** Building harfbuzz ***"
+cd $BUILD_DIR/harfbuzz-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+make -j $jval
+make install
+
+echo "*** Building fribidi ***"
+cd $BUILD_DIR/fribidi-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+make -j $jval
+make install
+
+echo "*** Building libass ***"
+cd $BUILD_DIR/libass-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
 echo "*** Building mp3lame ***"
 cd $BUILD_DIR/lame*
 # The lame build script does not recognize aarch64, so need to set it manually
@@ -181,12 +222,14 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --pkg-config-flags="--static" \
   --extra-cflags="-I$TARGET_DIR/include" \
   --extra-ldflags="-L$TARGET_DIR/lib" \
+  --extra-ldexeflags="-static" \
   --bindir="$BIN_DIR" \
   --enable-pic \
   --enable-ffplay \
   --enable-ffserver \
   --enable-gpl \
   --enable-libass \
+  --enable-libfribidi \
   --enable-libfdk-aac \
   --enable-libfreetype \
   --enable-libmp3lame \
