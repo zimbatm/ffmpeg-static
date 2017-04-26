@@ -17,17 +17,26 @@ RUN apt-get update && apt-get install -y \
   build-essential \
   cmake \
   curl \
+  frei0r-plugins-dev \
+  gawk \
   libfontconfig-dev \
   libfreetype6-dev \
+  libopencore-amrnb-dev \
+  libopencore-amrwb-dev \
   libsdl1.2-dev \
+  libspeex-dev \
+  libssl-dev \
   libtheora-dev \
   libtool \
   libva-dev \
   libvdpau-dev \
+  libvo-amrwbenc-dev \
   libvorbis-dev \
+  libwebp-dev \
   libxcb1-dev \
   libxcb-shm0-dev \
   libxcb-xfixes0-dev \
+  libxvidcore-dev \
   lsb-release \
   pkg-config \
   sudo \
