@@ -6,9 +6,10 @@ set -u
 jflag=
 jval=2
 rebuild=0
+download_only=0
 uname -mpi | grep -qE 'x86|i386|i686' && is_x86=1 || is_x86=0
 
-while getopts 'j:B' OPTION
+while getopts 'j:Bd' OPTION
 do
   case $OPTION in
   j)
@@ -18,8 +19,11 @@ do
   B)
       rebuild=1
       ;;
+  d)
+      download_only=1
+      ;;
   ?)
-      printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%) [-B]\n" $(basename $0) >&2
+      printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%) [-B] [-d]\n" $(basename $0) >&2
       exit 2
       ;;
   esac
@@ -127,6 +131,8 @@ download \
   "ffmpeg3.2.4.tar.gz" \
   "8ca58121dd042153656d89eba3daa7ab" \
   "https://github.com/FFmpeg/FFmpeg/archive"
+
+[ $download_only -eq 1 ] && exit 0
 
 if [ $is_x86 -eq 1 ]; then
     echo "*** Building yasm ***"

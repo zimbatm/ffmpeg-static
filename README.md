@@ -22,7 +22,7 @@ Build dependencies
 Build & "install"
 -----------------
 
-    $ ./build.sh [-j <jobs>] [-B]
+    $ ./build.sh [-j <jobs>] [-B] [-d]
     # ... wait ...
     # binaries can be found in ./target/bin/
 
@@ -30,12 +30,24 @@ Ubuntu users can download dependencies and and install in one command:
 
     $ sudo ./build-ubuntu.sh
 
-If you have built ffmpeg before with `build.sh`, the default behaviour is to keep the previous configuration. If you would like to reconfigure and rebuild all packages, use the `-B` flag. 
+If you have built ffmpeg before with `build.sh`, the default behaviour is to keep the previous configuration. If you would like to reconfigure and rebuild all packages, use the `-B` flag. `-d` flag will only download and unpack the dependencies but not build.
 
 NOTE: If you're going to use the h264 presets, make sure to copy them along the binaries. For ease, you can put them in your home folder like this:
 
     $ mkdir ~/.ffmpeg
     $ cp ./target/share/ffmpeg/*.ffpreset ~/.ffmpeg
+
+
+Build in docker
+---------------
+
+    $ docker build -t ffmpeg-static .
+    $ docker run -it ffmpeg-static
+    $ ./build.sh [-j <jobs>] [-B] [-d]
+
+The binaries will be created in `/ffmpeg-static/bin` directory.
+Method of getting them out of the Docker container is up to you.
+`/ffmpeg-static` is a Docker volume.
 
 Debug
 -----
