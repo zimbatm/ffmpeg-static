@@ -281,13 +281,6 @@ cd $BUILD_DIR/zimg-release-*
 make -j $jval
 make install
 
-NPROC=1
-if which `nproc`;then
-	NPROC="`nproc`"
-elif [ -f /proc/cpuinfo ];then
-	NPROC="`grep -c ^processor /proc/cpuinfo`"
-fi
-
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
@@ -330,7 +323,7 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --enable-libxvid \
   --enable-libzimg \
   --enable-nonfree
-PATH="$BIN_DIR:$PATH" make -j$NPROC
+PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 make distclean
 hash -r
