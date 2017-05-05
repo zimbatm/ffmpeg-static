@@ -6,9 +6,10 @@ set -u
 jflag=
 jval=2
 rebuild=0
+download_only=0
 uname -mpi | grep -qE 'x86|i386|i686' && is_x86=1 || is_x86=0
 
-while getopts 'j:B' OPTION
+while getopts 'j:Bd' OPTION
 do
   case $OPTION in
   j)
@@ -18,8 +19,11 @@ do
   B)
       rebuild=1
       ;;
+  d)
+      download_only=1
+      ;;
   ?)
-      printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%) [-B]\n" $(basename $0) >&2
+      printf "Usage: %s: [-j concurrency_level] (hint: your cores + 20%%) [-B] [-d]\n" $(basename $0) >&2
       exit 2
       ;;
   esac
@@ -85,6 +89,25 @@ download \
   "nil" \
   "https://github.com/mstorsjo/fdk-aac/tarball"
 
+# libass dependency
+download \
+  "harfbuzz-1.4.6.tar.bz2" \
+  "" \
+  "e246c08a3bac98e31e731b2a1bf97edf" \
+  "https://www.freedesktop.org/software/harfbuzz/release/"
+
+download \
+  "fribidi-0.19.7.tar.bz2" \
+  "" \
+  "6c7e7cfdd39c908f7ac619351c1c5c23" \
+  "https://www.fribidi.org/download/"
+
+download \
+  "0.13.6.tar.gz" \
+  "libass-0.13.6.tar.gz" \
+  "nil" \
+  "https://github.com/libass/libass/archive/"
+
 download \
   "lame-3.99.5.tar.gz" \
   "" \
@@ -104,10 +127,44 @@ download \
   "https://github.com/webmproject/libvpx/archive"
 
 download \
+  "rtmpdump-2.3.tgz" \
+  "" \
+  "eb961f31cd55f0acf5aad1a7b900ef59" \
+  "https://rtmpdump.mplayerhq.hu/download/"
+
+download \
+  "soxr-0.1.2-Source.tar.xz" \
+  "" \
+  "0866fc4320e26f47152798ac000de1c0" \
+  "https://sourceforge.net/projects/soxr/files/"
+
+download \
+  "release-0.98b.tar.gz" \
+  "vid.stab-release-0.98b.tar.gz" \
+  "299b2f4ccd1b94c274f6d94ed4f1c5b8" \
+  "https://github.com/georgmartius/vid.stab/archive/"
+
+download \
+  "release-2.5.1.tar.gz" \
+  "zimg-release-2.5.1.tar.gz" \
+  "24afac41d38398bef9ee9a55c6bf1627" \
+  "https://github.com/sekrit-twc/zimg/archive/"
+
+download \
+  "v2.1.2.tar.gz" \
+  "openjpeg-2.1.2.tar.gz" \
+  "40a7bfdcc66280b3c1402a0eb1a27624" \
+  "https://github.com/uclouvain/openjpeg/archive/"
+
+download \
   "n3.2.4.tar.gz" \
   "ffmpeg3.2.4.tar.gz" \
   "8ca58121dd042153656d89eba3daa7ab" \
   "https://github.com/FFmpeg/FFmpeg/archive"
+
+[ $download_only -eq 1 ] && exit 0
+
+TARGET_DIR_SED=$(echo $TARGET_DIR | awk '{gsub(/\//, "\\/"); print}')
 
 if [ $is_x86 -eq 1 ]; then
     echo "*** Building yasm ***"
@@ -141,6 +198,28 @@ autoreconf -fiv
 make -j $jval
 make install
 
+echo "*** Building harfbuzz ***"
+cd $BUILD_DIR/harfbuzz-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+make -j $jval
+make install
+
+echo "*** Building fribidi ***"
+cd $BUILD_DIR/fribidi-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+make -j $jval
+make install
+
+echo "*** Building libass ***"
+cd $BUILD_DIR/libass-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
 echo "*** Building mp3lame ***"
 cd $BUILD_DIR/lame*
 # The lame build script does not recognize aarch64, so need to set it manually
@@ -164,12 +243,43 @@ cd $BUILD_DIR/libvpx*
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
-NPROC=1
-if which `nproc`;then
-	NPROC="`nproc`"
-elif [ -f /proc/cpuinfo ];then
-	NPROC="`grep -c ^processor /proc/cpuinfo`"
-fi
+echo "*** Building librtmp ***"
+cd $BUILD_DIR/rtmpdump-*
+cd librtmp
+[ $rebuild -eq 1 ] && make distclean || true
+sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+make -j $jval
+make install
+
+echo "*** Building libsoxr ***"
+cd $BUILD_DIR/soxr-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DBUILD_SHARED_LIBS:bool=off -DWITH_OPENMP:bool=off -DBUILD_TESTS:bool=off
+make -j $jval
+make install
+
+echo "*** Building libvidstab ***"
+cd $BUILD_DIR/vid.stab-release-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
+make -j $jval
+make install
+
+echo "*** Building openjpeg ***"
+cd $BUILD_DIR/openjpeg-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DBUILD_SHARED_LIBS:bool=off
+make -j $jval
+make install
+
+echo "*** Building zimg ***"
+cd $BUILD_DIR/zimg-release-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --enable-static  --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
 
 # FFMpeg
 echo "*** Building FFmpeg ***"
@@ -181,23 +291,39 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --pkg-config-flags="--static" \
   --extra-cflags="-I$TARGET_DIR/include" \
   --extra-ldflags="-L$TARGET_DIR/lib" \
+  --extra-ldexeflags="-static" \
   --bindir="$BIN_DIR" \
   --enable-pic \
   --enable-ffplay \
   --enable-ffserver \
+  --enable-fontconfig \
+  --enable-frei0r \
   --enable-gpl \
+  --enable-version3 \
   --enable-libass \
+  --enable-libfribidi \
   --enable-libfdk-aac \
   --enable-libfreetype \
   --enable-libmp3lame \
+  --enable-libopencore-amrnb \
+  --enable-libopencore-amrwb \
+  --enable-libopenjpeg \
   --enable-libopus \
+  --enable-librtmp \
+  --enable-libsoxr \
+  --enable-libspeex \
   --enable-libtheora \
+  --enable-libvidstab \
+  --enable-libvo-amrwbenc \
   --enable-libvorbis \
   --enable-libvpx \
+  --enable-libwebp \
   --enable-libx264 \
   --enable-libx265 \
+  --enable-libxvid \
+  --enable-libzimg \
   --enable-nonfree
-PATH="$BIN_DIR:$PATH" make -j$NPROC
+PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 make distclean
 hash -r
