@@ -39,7 +39,7 @@ then
 fi
 
 [ "$rebuild" -eq 1 ] && echo "Reconfiguring existing packages..."
-[ $is_x86 -ne 1 ] && echo "Not using yasm on non-x86 platform..."
+[ $is_x86 -ne 1 ] && echo "Not using yasm or nasm on non-x86 platform..."
 
 cd `dirname $0`
 ENV_ROOT=`pwd`
@@ -70,6 +70,12 @@ cd $BUILD_DIR
   "" \
   "fc9e586751ff789b34b1f21d572d96af" \
   "http://www.tortall.net/projects/yasm/releases/"
+
+[ $is_x86 -eq 1 ] && download \
+  "nasm-2.13.01.tar.gz" \
+  "" \
+  "16050aa29bc0358989ef751d12b04ed2" \
+  "http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/"
 
 download \
   "last_x264.tar.bz2" \
@@ -169,6 +175,15 @@ TARGET_DIR_SED=$(echo $TARGET_DIR | awk '{gsub(/\//, "\\/"); print}')
 if [ $is_x86 -eq 1 ]; then
     echo "*** Building yasm ***"
     cd $BUILD_DIR/yasm*
+    [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+    [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
+    make -j $jval
+    make install
+fi
+
+if [ $is_x86 -eq 1 ]; then
+    echo "*** Building nasm ***"
+    cd $BUILD_DIR/nasm*
     [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
     [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --bindir=$BIN_DIR
     make -j $jval
@@ -327,4 +342,3 @@ PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 make distclean
 hash -r
-
