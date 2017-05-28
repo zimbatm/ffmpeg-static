@@ -1,0 +1,8 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - docker build -t ci .
+  - docker run -ti --rm ci bash -c "ldd bin/ffmpeg | grep 'not a dynamic executable'"
