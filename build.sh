@@ -337,7 +337,8 @@ PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
   --enable-libx265 \
   --enable-libxvid \
   --enable-libzimg \
-  --enable-nonfree
+  --enable-nonfree \
+  --enable-openssl
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 make distclean
