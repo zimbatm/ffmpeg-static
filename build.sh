@@ -103,10 +103,10 @@ download \
   "https://www.freedesktop.org/software/harfbuzz/release/"
 
 download \
-  "fribidi-0.19.7.tar.bz2" \
+  "fribidi-1.0.2.tar.bz2" \
   "" \
-  "6c7e7cfdd39c908f7ac619351c1c5c23" \
-  "https://www.fribidi.org/download/"
+  "bd2eb2f3a01ba11a541153f505005a7b" \
+  "https://github.com/fribidi/fribidi/releases/download/v1.0.2/"
 
 download \
   "0.13.6.tar.gz" \
