@@ -142,7 +142,7 @@ download \
   "soxr-0.1.2-Source.tar.xz" \
   "" \
   "0866fc4320e26f47152798ac000de1c0" \
-  "https://sourceforge.net/projects/soxr/files/"
+  "https://download.videolan.org/pub/contrib/soxr/"
 
 download \
   "release-0.98b.tar.gz" \
