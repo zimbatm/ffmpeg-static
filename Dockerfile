@@ -1,4 +1,4 @@
-FROM ubuntu:17.10
+FROM ubuntu:bionic
 
 # Basic packages needed to download dependencies and unpack them.
 RUN apt-get update && apt-get install -y \
@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y \
   libopencore-amrwb-dev \
   libsdl2-dev \
   libspeex-dev \
-  libssl-dev \
   libtheora-dev \
   libtool \
   libva-dev \
@@ -43,7 +42,6 @@ RUN apt-get update && apt-get install -y \
   tar \
   texi2html \
   yasm \
-  zlib1g-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy the build scripts.

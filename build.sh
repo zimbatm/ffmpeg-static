@@ -45,7 +45,7 @@ cd `dirname $0`
 ENV_ROOT=`pwd`
 . ./env.source
 
-# detect OS
+# check operating system
 OS=`uname`
 platform="unknown"
 
@@ -89,6 +89,18 @@ cd $BUILD_DIR
   "" \
   "16050aa29bc0358989ef751d12b04ed2" \
   "http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/"
+
+download \
+  "OpenSSL_1_0_2o.tar.gz" \
+  "" \
+  "5b5c050f83feaa0c784070637fac3af4" \
+  "https://github.com/openssl/openssl/archive/"
+
+download \
+  "v1.2.11.tar.gz" \
+  "zlib-1.2.11.tar.gz" \
+  "0095d2d2d1f3442ce1318336637b695f" \
+  "https://github.com/madler/zlib/archive/"
 
 download \
   "last_x264.tar.bz2" \
@@ -227,6 +239,28 @@ if [ $is_x86 -eq 1 ]; then
     make install
 fi
 
+echo "*** Building OpenSSL ***"
+cd $BUILD_DIR/openssl*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "darwin" ]; then
+  PATH="$BIN_DIR:$PATH" ./Configure darwin64-x86_64-cc --prefix=$TARGET_DIR
+elif [ "$platform" = "linux" ]; then
+  PATH="$BIN_DIR:$PATH" ./config --prefix=/usr/local
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo "*** Building zlib ***"
+cd $BUILD_DIR/zlib*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=/usr/local
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
@@ -301,12 +335,10 @@ cd librtmp
 [ $rebuild -eq 1 ] && make distclean || true
 if [ "$platform" = "linux" ]; then
   sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
-  make -j $jval
-  make install
 elif [ "$platform" = "darwin" ]; then
   sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
-  make install_base
 fi
+make install_base
 
 echo "*** Building libsoxr ***"
 cd $BUILD_DIR/soxr-*
@@ -386,6 +418,7 @@ if [ "$platform" = "linux" ]; then
     --pkg-config-flags="--static" \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
+    --extra-libs="-lpthread -lm -lz" \
     --extra-ldexeflags="-Bstatic" \
     --bindir="$BIN_DIR" \
     --enable-pic \
