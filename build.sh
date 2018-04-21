@@ -275,11 +275,11 @@ echo "*** Building librtmp ***"
 cd $BUILD_DIR/rtmpdump-*
 cd librtmp
 [ $rebuild -eq 1 ] && make distclean || true
-if [[ "$platform" == "linux" ]]; then
+if [ "$platform" = "linux" ]; then
   sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
   make -j $jval
   make install
-elif [[ "$platform" == "darwin" ]]; then
+elif [ "$platform" = "darwin" ]; then
   sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
   make install_base
 fi
@@ -294,9 +294,9 @@ make install
 echo "*** Building libvidstab ***"
 cd $BUILD_DIR/vid.stab-release-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-if [[ "$platform" == "linux" ]]; then
+if [ "$platform" = "linux" ]; then
   sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
-elif [[ "$platform" == "darwin" ]]; then
+elif [ "$platform" = "darwin" ]; then
   sed -i "" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
 fi
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
@@ -322,15 +322,15 @@ make install
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
 
-if [[ "$platform" == "linux" ]]; then
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
-    --extra-ldexeflags="-static" \
+    --extra-ldexeflags="-Bstatic" \
     --bindir="$BIN_DIR" \
     --enable-pic \
     --enable-ffplay \
@@ -363,7 +363,8 @@ if [[ "$platform" == "linux" ]]; then
     --enable-libzimg \
     --enable-nonfree \
     --enable-openssl
-elif [[ "$platform" == "darwin" ]]; then
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
   PKG_CONFIG_PATH="${TARGET_DIR}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/Cellar/openssl/1.0.2o_1/lib/pkgconfig" ./configure \
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
