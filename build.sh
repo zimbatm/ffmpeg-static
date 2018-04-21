@@ -164,9 +164,9 @@ download \
   "https://github.com/georgmartius/vid.stab/archive/"
 
 download \
-  "release-2.5.1.tar.gz" \
-  "zimg-release-2.5.1.tar.gz" \
-  "24afac41d38398bef9ee9a55c6bf1627" \
+  "release-2.7.4.tar.gz" \
+  "zimg-release-2.7.4.tar.gz" \
+  "1757dcc11590ef3b5a56c701fd286345" \
   "https://github.com/sekrit-twc/zimg/archive/"
 
 download \
@@ -176,9 +176,33 @@ download \
   "https://github.com/uclouvain/openjpeg/archive/"
 
 download \
-  "n3.4.2.tar.gz" \
-  "ffmpeg3.4.2.tar.gz" \
-  "935a1c02531f6e2b8c97d35cef4e4538" \
+  "v0.6.1.tar.gz" \
+  "libwebp-0.6.1.tar.gz" \
+  "1c3099cd2656d0d80d3550ee29fc0f28" \
+  "https://github.com/webmproject/libwebp/archive/"
+
+download \
+  "v1.3.6.tar.gz" \
+  "vorbis-1.3.6.tar.gz" \
+  "03e967efb961f65a313459c5d0f4cbfb" \
+  "https://github.com/xiph/vorbis/archive/"
+
+download \
+  "v1.3.3.tar.gz" \
+  "ogg-1.3.3.tar.gz" \
+  "b8da1fe5ed84964834d40855ba7b93c2" \
+  "https://github.com/xiph/ogg/archive/"
+
+download \
+  "Speex-1.2.0.tar.gz" \
+  "Speex-1.2.0.tar.gz" \
+  "4bec86331abef56129f9d1c994823f03" \
+  "https://github.com/xiph/speex/archive/"
+
+download \
+  "n4.0.tar.gz" \
+  "ffmpeg4.0.tar.gz" \
+  "4749a5e56f31e7ccebd3f9924972220f" \
   "https://github.com/FFmpeg/FFmpeg/archive"
 
 [ $download_only -eq 1 ] && exit 0
@@ -318,6 +342,38 @@ cd $BUILD_DIR/zimg-release-*
 make -j $jval
 make install
 
+echo "*** Building libwebp ***"
+cd $BUILD_DIR/libwebp*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libvorbis ***"
+cd $BUILD_DIR/vorbis*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libogg ***"
+cd $BUILD_DIR/ogg*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libspeex ***"
+cd $BUILD_DIR/speex*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
@@ -334,7 +390,6 @@ if [ "$platform" = "linux" ]; then
     --bindir="$BIN_DIR" \
     --enable-pic \
     --enable-ffplay \
-    --enable-ffserver \
     --enable-fontconfig \
     --enable-frei0r \
     --enable-gpl \
@@ -375,7 +430,6 @@ elif [ "$platform" = "darwin" ]; then
     --bindir="$BIN_DIR" \
     --enable-pic \
     --enable-ffplay \
-    --enable-ffserver \
     --enable-fontconfig \
     --enable-frei0r \
     --enable-gpl \
