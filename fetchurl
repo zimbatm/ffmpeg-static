@@ -104,10 +104,10 @@ if [ "$UNPACK" -ne 0 ]; then
   target_dir=`expand_path "$EXTRACT_DIR"`
   mkdir -p "$target_dir"
   sh cd "$target_dir"
- 
-  [ "$REPLACE" -ne 1 ] && tarargs="--skip-old-files" || tarargs=""
+
+  [ "$REPLACE" -ne 1 ] && tarargs=""
   case "$extname" in
-    .tar.gz|.tgz)    
+    .tar.gz|.tgz)
       sh tar "$tarargs" -xzvf "$cache_file"
     ;;
     .tar.bz2)

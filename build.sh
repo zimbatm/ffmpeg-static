@@ -45,6 +45,19 @@ cd `dirname $0`
 ENV_ROOT=`pwd`
 . ./env.source
 
+# detect OS
+OS=`uname`
+platform="unknown"
+
+case $OS in
+  'Darwin')
+    platform='darwin'
+    ;;
+  'Linux')
+    platform='linux'
+    ;;
+esac
+
 #if you want a rebuild
 #rm -rf "$BUILD_DIR" "$TARGET_DIR"
 mkdir -p "$BUILD_DIR" "$TARGET_DIR" "$DOWNLOAD_DIR" "$BIN_DIR"
@@ -84,16 +97,16 @@ download \
   "http://download.videolan.org/pub/videolan/x264/snapshots/"
 
 download \
-  "x265_2.3.tar.gz" \
+  "x265_2.7.tar.gz" \
   "" \
-  "18716a7e0c6f6ebd2a1035b82cec30de" \
+  "b0d7d20da2a418fa4f53a559946ea079" \
   "https://bitbucket.org/multicoreware/x265/downloads/"
 
 download \
-  "master" \
+  "v0.1.6.tar.gz" \
   "fdk-aac.tar.gz" \
-  "nil" \
-  "https://github.com/mstorsjo/fdk-aac/tarball"
+  "223d5f579d29fb0d019a775da4e0e061" \
+  "https://github.com/mstorsjo/fdk-aac/archive"
 
 # libass dependency
 download \
@@ -163,9 +176,9 @@ download \
   "https://github.com/uclouvain/openjpeg/archive/"
 
 download \
-  "n3.2.4.tar.gz" \
-  "ffmpeg3.2.4.tar.gz" \
-  "8ca58121dd042153656d89eba3daa7ab" \
+  "n3.4.2.tar.gz" \
+  "ffmpeg3.4.2.tar.gz" \
+  "935a1c02531f6e2b8c97d35cef4e4538" \
   "https://github.com/FFmpeg/FFmpeg/archive"
 
 [ $download_only -eq 1 ] && exit 0
@@ -206,7 +219,7 @@ make -j $jval
 make install
 
 echo "*** Building fdk-aac ***"
-cd $BUILD_DIR/mstorsjo-fdk-aac*
+cd $BUILD_DIR/fdk-aac*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 autoreconf -fiv
 [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
@@ -223,7 +236,7 @@ make install
 echo "*** Building fribidi ***"
 cd $BUILD_DIR/fribidi-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static --disable-docs
 make -j $jval
 make install
 
@@ -262,9 +275,14 @@ echo "*** Building librtmp ***"
 cd $BUILD_DIR/rtmpdump-*
 cd librtmp
 [ $rebuild -eq 1 ] && make distclean || true
-sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
-make -j $jval
-make install
+if [[ "$platform" == "linux" ]]; then
+  sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+  make -j $jval
+  make install
+elif [[ "$platform" == "darwin" ]]; then
+  sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+  make install_base
+fi
 
 echo "*** Building libsoxr ***"
 cd $BUILD_DIR/soxr-*
@@ -276,7 +294,11 @@ make install
 echo "*** Building libvidstab ***"
 cd $BUILD_DIR/vid.stab-release-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+if [[ "$platform" == "linux" ]]; then
+  sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+elif [[ "$platform" == "darwin" ]]; then
+  sed -i "" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+fi
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
 make -j $jval
 make install
@@ -301,44 +323,86 @@ echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
-PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
-  --prefix="$TARGET_DIR" \
-  --pkg-config-flags="--static" \
-  --extra-cflags="-I$TARGET_DIR/include" \
-  --extra-ldflags="-L$TARGET_DIR/lib" \
-  --extra-ldexeflags="-static" \
-  --bindir="$BIN_DIR" \
-  --enable-pic \
-  --enable-ffplay \
-  --enable-ffserver \
-  --enable-fontconfig \
-  --enable-frei0r \
-  --enable-gpl \
-  --enable-version3 \
-  --enable-libass \
-  --enable-libfribidi \
-  --enable-libfdk-aac \
-  --enable-libfreetype \
-  --enable-libmp3lame \
-  --enable-libopencore-amrnb \
-  --enable-libopencore-amrwb \
-  --enable-libopenjpeg \
-  --enable-libopus \
-  --enable-librtmp \
-  --enable-libsoxr \
-  --enable-libspeex \
-  --enable-libtheora \
-  --enable-libvidstab \
-  --enable-libvo-amrwbenc \
-  --enable-libvorbis \
-  --enable-libvpx \
-  --enable-libwebp \
-  --enable-libx264 \
-  --enable-libx265 \
-  --enable-libxvid \
-  --enable-libzimg \
-  --enable-nonfree \
-  --enable-openssl
+
+if [[ "$platform" == "linux" ]]; then
+  PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
+    --prefix="$TARGET_DIR" \
+    --pkg-config-flags="--static" \
+    --extra-cflags="-I$TARGET_DIR/include" \
+    --extra-ldflags="-L$TARGET_DIR/lib" \
+    --extra-ldexeflags="-static" \
+    --bindir="$BIN_DIR" \
+    --enable-pic \
+    --enable-ffplay \
+    --enable-ffserver \
+    --enable-fontconfig \
+    --enable-frei0r \
+    --enable-gpl \
+    --enable-version3 \
+    --enable-libass \
+    --enable-libfribidi \
+    --enable-libfdk-aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopencore-amrnb \
+    --enable-libopencore-amrwb \
+    --enable-libopenjpeg \
+    --enable-libopus \
+    --enable-librtmp \
+    --enable-libsoxr \
+    --enable-libspeex \
+    --enable-libtheora \
+    --enable-libvidstab \
+    --enable-libvo-amrwbenc \
+    --enable-libvorbis \
+    --enable-libvpx \
+    --enable-libwebp \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-libxvid \
+    --enable-libzimg \
+    --enable-nonfree \
+    --enable-openssl
+elif [[ "$platform" == "darwin" ]]; then
+  PKG_CONFIG_PATH="${TARGET_DIR}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/Cellar/openssl/1.0.2o_1/lib/pkgconfig" ./configure \
+    --cc=/usr/bin/clang \
+    --prefix="$TARGET_DIR" \
+    --pkg-config-flags="--static" \
+    --extra-cflags="-I$TARGET_DIR/include" \
+    --extra-ldflags="-L$TARGET_DIR/lib" \
+    --extra-ldexeflags="-Bstatic" \
+    --bindir="$BIN_DIR" \
+    --enable-pic \
+    --enable-ffplay \
+    --enable-ffserver \
+    --enable-fontconfig \
+    --enable-frei0r \
+    --enable-gpl \
+    --enable-version3 \
+    --enable-libass \
+    --enable-libfribidi \
+    --enable-libfdk-aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopencore-amrnb \
+    --enable-libopencore-amrwb \
+    --enable-libopenjpeg \
+    --enable-libopus \
+    --enable-librtmp \
+    --enable-libsoxr \
+    --enable-libspeex \
+    --enable-libvidstab \
+    --enable-libvorbis \
+    --enable-libvpx \
+    --enable-libwebp \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-libxvid \
+    --enable-libzimg \
+    --enable-nonfree \
+    --enable-openssl
+fi
+
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 make distclean
