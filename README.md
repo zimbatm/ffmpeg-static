@@ -15,9 +15,10 @@ Build dependencies
     $ apt-get install build-essential curl tar libass-dev libtheora-dev libvorbis-dev libtool cmake automake autoconf
 
     # OS X
-    # install XCode, it can be found at http://developer.apple.com/
-    # (apple login needed)
-    # <FIXME???>
+    # 1. install XCode
+    # 2. install XCode command line tools
+    # 3. install homebrew
+    # brew install openssl frei0r sdl2
 
 Build & "install"
 -----------------
@@ -55,7 +56,7 @@ Debug
 On the top-level of the project, run:
 
     $ . env.source
-    
+
 You can then enter the source folders and make the compilation yourself
 
     $ cd build/ffmpeg-*
@@ -69,11 +70,11 @@ I'm not sure it's a good idea to statically link those, but it probably
 means the executable won't work across distributions or even across releases.
 
     # On Ubuntu 10.04:
-    $ ldd ./target/bin/ffmpeg 
+    $ ldd ./target/bin/ffmpeg
     not a dynamic executable
 
     # on OSX 10.6.4:
-    $ otool -L ffmpeg 
+    $ otool -L ffmpeg
     ffmpeg:
         /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 125.2.0)
 
@@ -88,7 +89,7 @@ As a contributor you can do whatever you want. Help maintain the scripts,
 upgrade dependencies and merge other people's PRs. Just be responsible and
 make an issue if you want to introduce bigger changes so we can discuss them
 beforehand.
- 
+
 ### TODO
 
  * Add some tests to check that video output is correctly generated

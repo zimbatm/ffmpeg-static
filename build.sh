@@ -45,6 +45,19 @@ cd `dirname $0`
 ENV_ROOT=`pwd`
 . ./env.source
 
+# check operating system
+OS=`uname`
+platform="unknown"
+
+case $OS in
+  'Darwin')
+    platform='darwin'
+    ;;
+  'Linux')
+    platform='linux'
+    ;;
+esac
+
 #if you want a rebuild
 #rm -rf "$BUILD_DIR" "$TARGET_DIR"
 mkdir -p "$BUILD_DIR" "$TARGET_DIR" "$DOWNLOAD_DIR" "$BIN_DIR"
@@ -78,22 +91,34 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/"
 
 download \
+  "OpenSSL_1_0_2o.tar.gz" \
+  "" \
+  "5b5c050f83feaa0c784070637fac3af4" \
+  "https://github.com/openssl/openssl/archive/"
+
+download \
+  "v1.2.11.tar.gz" \
+  "zlib-1.2.11.tar.gz" \
+  "0095d2d2d1f3442ce1318336637b695f" \
+  "https://github.com/madler/zlib/archive/"
+
+download \
   "last_x264.tar.bz2" \
   "" \
   "nil" \
   "http://download.videolan.org/pub/videolan/x264/snapshots/"
 
 download \
-  "x265_2.3.tar.gz" \
+  "x265_2.7.tar.gz" \
   "" \
-  "18716a7e0c6f6ebd2a1035b82cec30de" \
+  "b0d7d20da2a418fa4f53a559946ea079" \
   "https://bitbucket.org/multicoreware/x265/downloads/"
 
 download \
-  "master" \
+  "v0.1.6.tar.gz" \
   "fdk-aac.tar.gz" \
-  "nil" \
-  "https://github.com/mstorsjo/fdk-aac/tarball"
+  "223d5f579d29fb0d019a775da4e0e061" \
+  "https://github.com/mstorsjo/fdk-aac/archive"
 
 # libass dependency
 download \
@@ -151,9 +176,9 @@ download \
   "https://github.com/georgmartius/vid.stab/archive/"
 
 download \
-  "release-2.5.1.tar.gz" \
-  "zimg-release-2.5.1.tar.gz" \
-  "24afac41d38398bef9ee9a55c6bf1627" \
+  "release-2.7.4.tar.gz" \
+  "zimg-release-2.7.4.tar.gz" \
+  "1757dcc11590ef3b5a56c701fd286345" \
   "https://github.com/sekrit-twc/zimg/archive/"
 
 download \
@@ -163,9 +188,33 @@ download \
   "https://github.com/uclouvain/openjpeg/archive/"
 
 download \
-  "n3.2.4.tar.gz" \
-  "ffmpeg3.2.4.tar.gz" \
-  "8ca58121dd042153656d89eba3daa7ab" \
+  "v0.6.1.tar.gz" \
+  "libwebp-0.6.1.tar.gz" \
+  "1c3099cd2656d0d80d3550ee29fc0f28" \
+  "https://github.com/webmproject/libwebp/archive/"
+
+download \
+  "v1.3.6.tar.gz" \
+  "vorbis-1.3.6.tar.gz" \
+  "03e967efb961f65a313459c5d0f4cbfb" \
+  "https://github.com/xiph/vorbis/archive/"
+
+download \
+  "v1.3.3.tar.gz" \
+  "ogg-1.3.3.tar.gz" \
+  "b8da1fe5ed84964834d40855ba7b93c2" \
+  "https://github.com/xiph/ogg/archive/"
+
+download \
+  "Speex-1.2.0.tar.gz" \
+  "Speex-1.2.0.tar.gz" \
+  "4bec86331abef56129f9d1c994823f03" \
+  "https://github.com/xiph/speex/archive/"
+
+download \
+  "n4.0.tar.gz" \
+  "ffmpeg4.0.tar.gz" \
+  "4749a5e56f31e7ccebd3f9924972220f" \
   "https://github.com/FFmpeg/FFmpeg/archive"
 
 [ $download_only -eq 1 ] && exit 0
@@ -190,6 +239,28 @@ if [ $is_x86 -eq 1 ]; then
     make install
 fi
 
+echo "*** Building OpenSSL ***"
+cd $BUILD_DIR/openssl*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "darwin" ]; then
+  PATH="$BIN_DIR:$PATH" ./Configure darwin64-x86_64-cc --prefix=$TARGET_DIR
+elif [ "$platform" = "linux" ]; then
+  PATH="$BIN_DIR:$PATH" ./config --prefix=/usr/local
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo "*** Building zlib ***"
+cd $BUILD_DIR/zlib*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=/usr/local
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
 echo "*** Building x264 ***"
 cd $BUILD_DIR/x264*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
@@ -206,7 +277,7 @@ make -j $jval
 make install
 
 echo "*** Building fdk-aac ***"
-cd $BUILD_DIR/mstorsjo-fdk-aac*
+cd $BUILD_DIR/fdk-aac*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 autoreconf -fiv
 [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
@@ -223,7 +294,7 @@ make install
 echo "*** Building fribidi ***"
 cd $BUILD_DIR/fribidi-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static --disable-docs
 make -j $jval
 make install
 
@@ -262,9 +333,12 @@ echo "*** Building librtmp ***"
 cd $BUILD_DIR/rtmpdump-*
 cd librtmp
 [ $rebuild -eq 1 ] && make distclean || true
-sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
-make -j $jval
-make install
+if [ "$platform" = "linux" ]; then
+  sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+elif [ "$platform" = "darwin" ]; then
+  sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+fi
+make install_base
 
 echo "*** Building libsoxr ***"
 cd $BUILD_DIR/soxr-*
@@ -276,7 +350,11 @@ make install
 echo "*** Building libvidstab ***"
 cd $BUILD_DIR/vid.stab-release-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+if [ "$platform" = "linux" ]; then
+  sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+elif [ "$platform" = "darwin" ]; then
+  sed -i "" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+fi
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
 make -j $jval
 make install
@@ -296,49 +374,123 @@ cd $BUILD_DIR/zimg-release-*
 make -j $jval
 make install
 
+echo "*** Building libwebp ***"
+cd $BUILD_DIR/libwebp*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libvorbis ***"
+cd $BUILD_DIR/vorbis*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libogg ***"
+cd $BUILD_DIR/ogg*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libspeex ***"
+cd $BUILD_DIR/speex*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
-PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
-  --prefix="$TARGET_DIR" \
-  --pkg-config-flags="--static" \
-  --extra-cflags="-I$TARGET_DIR/include" \
-  --extra-ldflags="-L$TARGET_DIR/lib" \
-  --extra-ldexeflags="-static" \
-  --bindir="$BIN_DIR" \
-  --enable-pic \
-  --enable-ffplay \
-  --enable-ffserver \
-  --enable-fontconfig \
-  --enable-frei0r \
-  --enable-gpl \
-  --enable-version3 \
-  --enable-libass \
-  --enable-libfribidi \
-  --enable-libfdk-aac \
-  --enable-libfreetype \
-  --enable-libmp3lame \
-  --enable-libopencore-amrnb \
-  --enable-libopencore-amrwb \
-  --enable-libopenjpeg \
-  --enable-libopus \
-  --enable-librtmp \
-  --enable-libsoxr \
-  --enable-libspeex \
-  --enable-libtheora \
-  --enable-libvidstab \
-  --enable-libvo-amrwbenc \
-  --enable-libvorbis \
-  --enable-libvpx \
-  --enable-libwebp \
-  --enable-libx264 \
-  --enable-libx265 \
-  --enable-libxvid \
-  --enable-libzimg \
-  --enable-nonfree \
-  --enable-openssl
+
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
+  PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
+    --prefix="$TARGET_DIR" \
+    --pkg-config-flags="--static" \
+    --extra-cflags="-I$TARGET_DIR/include" \
+    --extra-ldflags="-L$TARGET_DIR/lib" \
+    --extra-libs="-lpthread -lm -lz" \
+    --extra-ldexeflags="-Bstatic" \
+    --bindir="$BIN_DIR" \
+    --enable-pic \
+    --enable-ffplay \
+    --enable-fontconfig \
+    --enable-frei0r \
+    --enable-gpl \
+    --enable-version3 \
+    --enable-libass \
+    --enable-libfribidi \
+    --enable-libfdk-aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopencore-amrnb \
+    --enable-libopencore-amrwb \
+    --enable-libopenjpeg \
+    --enable-libopus \
+    --enable-librtmp \
+    --enable-libsoxr \
+    --enable-libspeex \
+    --enable-libtheora \
+    --enable-libvidstab \
+    --enable-libvo-amrwbenc \
+    --enable-libvorbis \
+    --enable-libvpx \
+    --enable-libwebp \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-libxvid \
+    --enable-libzimg \
+    --enable-nonfree \
+    --enable-openssl
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
+  PKG_CONFIG_PATH="${TARGET_DIR}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/Cellar/openssl/1.0.2o_1/lib/pkgconfig" ./configure \
+    --cc=/usr/bin/clang \
+    --prefix="$TARGET_DIR" \
+    --pkg-config-flags="--static" \
+    --extra-cflags="-I$TARGET_DIR/include" \
+    --extra-ldflags="-L$TARGET_DIR/lib" \
+    --extra-ldexeflags="-Bstatic" \
+    --bindir="$BIN_DIR" \
+    --enable-pic \
+    --enable-ffplay \
+    --enable-fontconfig \
+    --enable-frei0r \
+    --enable-gpl \
+    --enable-version3 \
+    --enable-libass \
+    --enable-libfribidi \
+    --enable-libfdk-aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopencore-amrnb \
+    --enable-libopencore-amrwb \
+    --enable-libopenjpeg \
+    --enable-libopus \
+    --enable-librtmp \
+    --enable-libsoxr \
+    --enable-libspeex \
+    --enable-libvidstab \
+    --enable-libvorbis \
+    --enable-libvpx \
+    --enable-libwebp \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-libxvid \
+    --enable-libzimg \
+    --enable-nonfree \
+    --enable-openssl
+fi
+
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 make distclean

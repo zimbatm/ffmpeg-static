@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:bionic
 
 # Basic packages needed to download dependencies and unpack them.
 RUN apt-get update && apt-get install -y \
@@ -23,9 +23,8 @@ RUN apt-get update && apt-get install -y \
   libfreetype6-dev \
   libopencore-amrnb-dev \
   libopencore-amrwb-dev \
-  libsdl1.2-dev \
+  libsdl2-dev \
   libspeex-dev \
-  libssl-dev \
   libtheora-dev \
   libtool \
   libva-dev \
@@ -43,7 +42,6 @@ RUN apt-get update && apt-get install -y \
   tar \
   texi2html \
   yasm \
-  zlib1g-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy the build scripts.
