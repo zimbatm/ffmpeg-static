@@ -1,0 +1,10 @@
+sudo: required
+
+services:
+  - docker
+
+install:
+  - docker build -t ci .
+
+script:
+  - docker run -ti --rm ci bash -c "cd /ffmpeg-static ; ./build.sh -j $(($(nproc) + 1)) && ldd bin/ffmpeg ; (ldd bin/ffmpeg | grep 'not a dynamic executable')"
