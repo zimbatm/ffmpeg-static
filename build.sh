@@ -245,7 +245,7 @@ cd $BUILD_DIR/openssl*
 if [ "$platform" = "darwin" ]; then
   PATH="$BIN_DIR:$PATH" ./Configure darwin64-x86_64-cc --prefix=$TARGET_DIR
 elif [ "$platform" = "linux" ]; then
-  PATH="$BIN_DIR:$PATH" ./config --prefix=/usr/local
+  PATH="$BIN_DIR:$PATH" ./config --prefix=$TARGET_DIR
 fi
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
@@ -254,7 +254,7 @@ echo "*** Building zlib ***"
 cd $BUILD_DIR/zlib*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 if [ "$platform" = "linux" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=/usr/local
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
 elif [ "$platform" = "darwin" ]; then
   [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
 fi
@@ -272,7 +272,8 @@ echo "*** Building x265 ***"
 cd $BUILD_DIR/x265*
 cd build/linux
 [ $rebuild -eq 1 ] && find . -mindepth 1 ! -name 'make-Makefiles.bash' -and ! -name 'multilib.sh' -exec rm -r {} +
-PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:bool=off ../../source
+PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:BOOL=OFF -DSTATIC_LINK_CRT:BOOL=ON -DENABLE_CLI:BOOL=OFF ../../source
+sed -i 's/-lgcc_s/-lgcc_eh/g' x265.pc
 make -j $jval
 make install
 
@@ -333,10 +334,14 @@ echo "*** Building librtmp ***"
 cd $BUILD_DIR/rtmpdump-*
 cd librtmp
 [ $rebuild -eq 1 ] && make distclean || true
+
+# there's no configure, we have to edit Makefile directly
 if [ "$platform" = "linux" ]; then
-  sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+  sed -i "/INC=.*/d" ./Makefile # Remove INC if present from previous run.
+  sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}\nINC=-I\$(prefix)\/include/" ./Makefile
+  sed -i "s/SHARED=.*/SHARED=no/" ./Makefile
 elif [ "$platform" = "darwin" ]; then
-  sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile # there's no configure
+  sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile
 fi
 make install_base
 
@@ -419,7 +424,7 @@ if [ "$platform" = "linux" ]; then
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
-    --extra-ldexeflags="-Bstatic" \
+    --extra-ldexeflags="-static" \
     --bindir="$BIN_DIR" \
     --enable-pic \
     --enable-ffplay \
