@@ -18,7 +18,7 @@ Build dependencies
     # 1. install XCode
     # 2. install XCode command line tools
     # 3. install homebrew
-    # brew install openssl frei0r sdl2
+    # brew install cmake automake openssl frei0r sdl2
 
 Build & "install"
 -----------------

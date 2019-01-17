@@ -7,7 +7,7 @@ jflag=
 jval=2
 rebuild=0
 download_only=0
-uname -mpi | grep -qE 'x86|i386|i686' && is_x86=1 || is_x86=0
+uname -mp | grep -qE 'x86|i386|i686' && is_x86=1 || is_x86=0
 
 while getopts 'j:Bd' OPTION
 do
@@ -273,7 +273,7 @@ cd $BUILD_DIR/x265*
 cd build/linux
 [ $rebuild -eq 1 ] && find . -mindepth 1 ! -name 'make-Makefiles.bash' -and ! -name 'multilib.sh' -exec rm -r {} +
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:BOOL=OFF -DSTATIC_LINK_CRT:BOOL=ON -DENABLE_CLI:BOOL=OFF ../../source
-sed -i 's/-lgcc_s/-lgcc_eh/g' x265.pc
+sed -i='' 's/-lgcc_s/-lgcc_eh/g' x265.pc
 make -j $jval
 make install
 
@@ -336,13 +336,14 @@ cd librtmp
 [ $rebuild -eq 1 ] && make distclean || true
 
 # there's no configure, we have to edit Makefile directly
+sed -i='' "/INC=.*/d" ./Makefile # Remove INC if present from previous run.
 if [ "$platform" = "linux" ]; then
-  sed -i "/INC=.*/d" ./Makefile # Remove INC if present from previous run.
-  sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}\nINC=-I\$(prefix)\/include/" ./Makefile
-  sed -i "s/SHARED=.*/SHARED=no/" ./Makefile
+  sed -i='' "s/prefix=.*/prefix=${TARGET_DIR_SED}\nINC=-I$(prefix)\/include/" ./Makefile
 elif [ "$platform" = "darwin" ]; then
-  sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile
+  # BSD sed does not support \n
+  perl -pi -e "s/prefix=.*/prefix=${TARGET_DIR_SED}\nINC=-I\\$\(prefix\)\/include/" ./Makefile
 fi
+sed -i='' "s/SHARED=.*/SHARED=no/" ./Makefile
 make install_base
 
 echo "*** Building libsoxr ***"
@@ -355,11 +356,7 @@ make install
 echo "*** Building libvidstab ***"
 cd $BUILD_DIR/vid.stab-release-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-if [ "$platform" = "linux" ]; then
-  sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
-elif [ "$platform" = "darwin" ]; then
-  sed -i "" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
-fi
+sed -i="" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
 make -j $jval
 make install
