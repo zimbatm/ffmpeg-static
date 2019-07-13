@@ -48,4 +48,5 @@ RUN apt-get update && apt-get install -y \
 COPY build.sh download.pl env.source fetchurl /ffmpeg-static/
 
 VOLUME /ffmpeg-static
-CMD cd /ffmpeg-static; /bin/bash
+WORKDIR /ffmpeg-static
+CMD /bin/bash
