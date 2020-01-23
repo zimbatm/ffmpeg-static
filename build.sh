@@ -103,7 +103,7 @@ download \
   "https://github.com/madler/zlib/archive/"
 
 download \
-  "last_x264.tar.bz2" \
+  "x264-snapshot-20191217-2245-stable.tar.bz2" \
   "" \
   "nil" \
   "http://download.videolan.org/pub/videolan/x264/snapshots/"
