@@ -1,15 +1,19 @@
 #!/bin/bash
 
 sudo apt-get install build-essential curl tar pkg-config
-sudo apt-get -y --force-yes install \
+sudo apt-get install \
   autoconf \
   automake \
   build-essential \
   cmake \
   frei0r-plugins-dev \
   gawk \
+  gcc \
+  g++ \
   libass-dev \
+  libcairo2-dev \
   libfreetype6-dev \
+  libglib2.0-dev \
   libopencore-amrnb-dev \
   libopencore-amrwb-dev \
   libsdl1.2-dev \
@@ -27,6 +31,7 @@ sudo apt-get -y --force-yes install \
   libxcb-xfixes0-dev \
   libxvidcore-dev \
   pkg-config \
+  ragel \
   texi2html \
   zlib1g-dev
 
@@ -42,4 +47,3 @@ if [ $need_ppa -eq 1 ]; then
 fi
 
 ./build.sh "$@"
-
