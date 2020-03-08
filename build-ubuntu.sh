@@ -1,15 +1,12 @@
 #!/bin/bash
 
-sudo apt-get install build-essential curl tar pkg-config
-sudo apt-get install \
-  autoconf \
-  automake \
-  build-essential \
-  cmake \
+# Install needed updates
+sudo apt install build-essential g++ gcc pkg-config tar
+# Install needed tools
+sudo apt install autoconf automake cmake curl git gawk libtool ragel texi2html
+# Install dependencies (only add if needed)
+#sudo apt-get install \
   frei0r-plugins-dev \
-  gawk \
-  gcc \
-  g++ \
   libass-dev \
   libcairo2-dev \
   libfreetype6-dev \
@@ -20,7 +17,6 @@ sudo apt-get install \
   libspeex-dev \
   libssl-dev \
   libtheora-dev \
-  libtool \
   libva-dev \
   libvdpau-dev \
   libvo-amrwbenc-dev \
@@ -30,9 +26,6 @@ sudo apt-get install \
   libxcb-shm0-dev \
   libxcb-xfixes0-dev \
   libxvidcore-dev \
-  pkg-config \
-  ragel \
-  texi2html \
   zlib1g-dev
 
 # For 12.04
@@ -47,3 +40,4 @@ if [ $need_ppa -eq 1 ]; then
 fi
 
 ./build.sh "$@"
+
