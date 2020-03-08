@@ -91,9 +91,9 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
-  "OpenSSL_1_1_1-stable.tar.gz" \
+  "OpenSSL_1_0_2o.tar.gz" \
   "" \
-  "b63a754baf39556d7e6451cb20ceafd0" \
+  "5b5c050f83feaa0c784070637fac3af4" \
   "https://github.com/openssl/openssl/archive/"
 
 download \
@@ -103,7 +103,7 @@ download \
   "https://github.com/madler/zlib/archive/"
 
 download \
-  "x264-master.tar.gz" \
+  "x264-master.tar.bz2" \
   "" \
   "nil" \
   "https://code.videolan.org/videolan/x264/-/archive/master/"
@@ -151,11 +151,12 @@ download \
   "b27f67923ffcbc8efb4ce7f29cbe3faf" \
   "https://github.com/xiph/opus/archive/"
 
-download \
-  "v1.8.2.tar.gz" \
-  "libvpx-v1.8.2.tar.gz" \
-  "nil" \
-  "https://chromium.googlesource.com/webm/libvpx/+archive/"
+#download \
+#  "v1.8.2.tar.gz" \
+#  "libvpx-v1.8.2.tar.gz" \
+#  "6dbccca688886c66a216d7e445525bce" \
+#  "https://github.com/webmproject/libvpx/archive/"
+git clone https://chromium.googlesource.com/webm/libvpx "$BUILD_DIR"/libvpx-clone
 
 download \
   "rtmpdump-2.3.tgz" \
@@ -170,9 +171,9 @@ download \
   "https://sourceforge.net/projects/soxr/files/"
 
 download \
-  "v1.1.0.tar.gz" \
-  "vid.stab-1.1.0.tar.gz" \
-  "633af54b7e2fd5734265ac7488ac263a" \
+  "release-0.98b.tar.gz" \
+  "vid.stab-release-0.98b.tar.gz" \
+  "299b2f4ccd1b94c274f6d94ed4f1c5b8" \
   "https://github.com/georgmartius/vid.stab/archive/"
 
 download \
@@ -373,14 +374,14 @@ make -j $jval
 make install
 
 echo "*** Building libvidstab ***"
-cd $BUILD_DIR/vid.stab-release-*
+cd $BUILD_DIR/vid.stab-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 if [ "$platform" = "linux" ]; then
   sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
 elif [ "$platform" = "darwin" ]; then
   sed -i "" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
 fi
-PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
+PATH="$BIN_DIR:$PATH" cmake -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
 make -j $jval
 make install
 
