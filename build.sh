@@ -85,15 +85,15 @@ cd $BUILD_DIR
   "http://www.tortall.net/projects/yasm/releases/"
 
 [ $is_x86 -eq 1 ] && download \
-  "nasm-2.13.01.tar.gz" \
+  "nasm-2.14.tar.gz" \
   "" \
-  "16050aa29bc0358989ef751d12b04ed2" \
-  "http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/"
+  "bc1cdaa06fc522eefa35c4ba881348f5" \
+  "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
-  "OpenSSL_1_0_2o.tar.gz" \
+  "OpenSSL_1_1_1-stable.tar.gz" \
   "" \
-  "5b5c050f83feaa0c784070637fac3af4" \
+  "b63a754baf39556d7e6451cb20ceafd0" \
   "https://github.com/openssl/openssl/archive/"
 
 download \
@@ -103,59 +103,59 @@ download \
   "https://github.com/madler/zlib/archive/"
 
 download \
-  "last_x264.tar.bz2" \
+  "x264-master.tar.gz" \
   "" \
   "nil" \
-  "http://download.videolan.org/pub/videolan/x264/snapshots/"
+  "https://code.videolan.org/videolan/x264/-/archive/master/"
 
 download \
-  "x265_2.7.tar.gz" \
+  "x265_3.2.1.tar.gz" \
   "" \
-  "b0d7d20da2a418fa4f53a559946ea079" \
+  "94808045a34d88a857e5eaf3f68f4bca" \
   "https://bitbucket.org/multicoreware/x265/downloads/"
 
 download \
-  "v0.1.6.tar.gz" \
-  "fdk-aac.tar.gz" \
-  "223d5f579d29fb0d019a775da4e0e061" \
+  "v2.0.1.tar.gz" \
+  "fdk-aac-2.0.1.tar.gz" \
+  "5b85f858ee416a058574a1028a3e1b85" \
   "https://github.com/mstorsjo/fdk-aac/archive"
 
 # libass dependency
 download \
-  "harfbuzz-1.4.6.tar.bz2" \
-  "" \
-  "e246c08a3bac98e31e731b2a1bf97edf" \
-  "https://www.freedesktop.org/software/harfbuzz/release/"
+  "2.6.4.tar.gz" \
+  "harfbuzz-2.6.4.tar.gz" \
+  "188407981048daf6d92d554cfeeed48e" \
+  "https://github.com/harfbuzz/harfbuzz/archive/"
 
 download \
-  "fribidi-1.0.2.tar.bz2" \
+  "fribidi-1.0.8.tar.bz2" \
   "" \
-  "bd2eb2f3a01ba11a541153f505005a7b" \
-  "https://github.com/fribidi/fribidi/releases/download/v1.0.2/"
+  "962c7d8ebaa711d4e306161dbe14aa55" \
+  "https://github.com/fribidi/fribidi/releases/download/v1.0.8/"
 
 download \
-  "0.13.6.tar.gz" \
-  "libass-0.13.6.tar.gz" \
-  "nil" \
+  "0.14.0.tar.gz" \
+  "libass-0.14.0.tar.gz" \
+  "3c84884aa0589486bded10f71829bf39" \
   "https://github.com/libass/libass/archive/"
 
 download \
-  "lame-3.99.5.tar.gz" \
+  "lame-3.100.tar.gz" \
   "" \
-  "84835b313d4a8b68f5349816d33e07ce" \
-  "http://downloads.sourceforge.net/project/lame/lame/3.99"
+  "83e260acbe4389b54fe08e0bdbf7cddb" \
+  "http://downloads.sourceforge.net/project/lame/lame/3.100"
 
 download \
-  "opus-1.1.2.tar.gz" \
-  "" \
-  "1f08a661bc72930187893a07f3741a91" \
-  "https://github.com/xiph/opus/releases/download/v1.1.2"
+  "v1.3.1.tar.gz" \
+  "opus-1.3.1.tar.gz" \
+  "b27f67923ffcbc8efb4ce7f29cbe3faf" \
+  "https://github.com/xiph/opus/archive/"
 
 download \
-  "v1.6.1.tar.gz" \
-  "vpx-1.6.1.tar.gz" \
-  "b0925c8266e2859311860db5d76d1671" \
-  "https://github.com/webmproject/libvpx/archive"
+  "v1.8.2.tar.gz" \
+  "libvpx-v1.8.2.tar.gz" \
+  "nil" \
+  "https://chromium.googlesource.com/webm/libvpx/+archive/"
 
 download \
   "rtmpdump-2.3.tgz" \
@@ -164,33 +164,33 @@ download \
   "https://rtmpdump.mplayerhq.hu/download/"
 
 download \
-  "soxr-0.1.2-Source.tar.xz" \
+  "soxr-0.1.3-Source.tar.xz" \
   "" \
-  "0866fc4320e26f47152798ac000de1c0" \
+  "3f16f4dcb35b471682d4321eda6f6c08" \
   "https://sourceforge.net/projects/soxr/files/"
 
 download \
-  "release-0.98b.tar.gz" \
-  "vid.stab-release-0.98b.tar.gz" \
-  "299b2f4ccd1b94c274f6d94ed4f1c5b8" \
+  "v1.1.0.tar.gz" \
+  "vid.stab-1.1.0.tar.gz" \
+  "633af54b7e2fd5734265ac7488ac263a" \
   "https://github.com/georgmartius/vid.stab/archive/"
 
 download \
-  "release-2.7.4.tar.gz" \
-  "zimg-release-2.7.4.tar.gz" \
-  "1757dcc11590ef3b5a56c701fd286345" \
+  "release-2.9.2.tar.gz" \
+  "zimg-release-2.9.2.tar.gz" \
+  "a3755bff6207fcca5c06e7b1b408ce2e" \
   "https://github.com/sekrit-twc/zimg/archive/"
 
 download \
-  "v2.1.2.tar.gz" \
-  "openjpeg-2.1.2.tar.gz" \
-  "40a7bfdcc66280b3c1402a0eb1a27624" \
+  "v2.3.1.tar.gz" \
+  "openjpeg-2.3.1.tar.gz" \
+  "3b9941dc7a52f0376694adb15a72903f" \
   "https://github.com/uclouvain/openjpeg/archive/"
 
 download \
-  "v0.6.1.tar.gz" \
-  "libwebp-0.6.1.tar.gz" \
-  "1c3099cd2656d0d80d3550ee29fc0f28" \
+  "v1.1.0.tar.gz" \
+  "libwebp-1.1.0.tar.gz" \
+  "35831dd0f8d42119691eb36f2b9d23b7" \
   "https://github.com/webmproject/libwebp/archive/"
 
 download \
@@ -200,9 +200,9 @@ download \
   "https://github.com/xiph/vorbis/archive/"
 
 download \
-  "v1.3.3.tar.gz" \
-  "ogg-1.3.3.tar.gz" \
-  "b8da1fe5ed84964834d40855ba7b93c2" \
+  "v1.3.4.tar.gz" \
+  "ogg-1.3.4.tar.gz" \
+  "df1a9a95251a289aa5515b869db4b15f" \
   "https://github.com/xiph/ogg/archive/"
 
 download \
@@ -211,10 +211,28 @@ download \
   "4bec86331abef56129f9d1c994823f03" \
   "https://github.com/xiph/speex/archive/"
 
+# download \
+#  "n4.0.tar.gz" \
+#  "ffmpeg4.0.tar.gz" \
+#  "4749a5e56f31e7ccebd3f9924972220f" \
+#  "https://github.com/FFmpeg/FFmpeg/archive"
+
+# download \
+#  "n4.1.tar.gz" \
+#  "ffmpeg4.1.tar.gz" \
+#  "53dfa0319f60e0da8835906063311f56" \
+#  "https://github.com/FFmpeg/FFmpeg/archive"
+
+# download \
+#  "n4.2.tar.gz" \
+#  "ffmpeg4.2.tar.gz" \
+#  "199e664666c6cde776f51a4312521489" \
+#  "https://github.com/FFmpeg/FFmpeg/archive"
+
 download \
-  "n4.0.tar.gz" \
-  "ffmpeg4.0.tar.gz" \
-  "4749a5e56f31e7ccebd3f9924972220f" \
+  "n4.2.2.tar.gz" \
+  "ffmpeg4.2.2.tar.gz" \
+  "85c99f782dd3244a8e02ea85d29ecee2" \
   "https://github.com/FFmpeg/FFmpeg/archive"
 
 [ $download_only -eq 1 ] && exit 0
@@ -288,6 +306,7 @@ make install
 echo "*** Building harfbuzz ***"
 cd $BUILD_DIR/harfbuzz-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
 ./configure --prefix=$TARGET_DIR --disable-shared --enable-static
 make -j $jval
 make install
@@ -319,6 +338,7 @@ make install
 echo "*** Building opus ***"
 cd $BUILD_DIR/opus*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
 [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --disable-shared
 make
 make install
