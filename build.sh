@@ -435,9 +435,8 @@ echo
 echo
 cd $BUILD_DIR/xvidcore/build/generic
 sed -i 's/^LN_S=@LN_S@/& -f -v/' platform.inc.in
-./configure --prefix=$TARGET_DIR --disable-shared --enable-static
-make -j $jval
-sed -i '/libdir.*STATIC_LIB/ s/^/#/' Makefile
+PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 chmod -v 755 $TARGET_DIR/lib/libxvidcore.so.4.3
 install -v -m755 -d $TARGET_DIR/share/doc/xvidcore-1.3.5/examples && install -v -m644 ../../doc/* $TARGET_DIR/share/doc/xvidcore-1.3.5 && install -v -m644 ../../examples/* $TARGET_DIR/share/doc/xvidcore-1.3.5/examples
