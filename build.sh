@@ -92,6 +92,12 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
+  "v1.2.11.tar.gz" \
+  "zlib-1.2.11.tar.gz" \
+  "0095d2d2d1f3442ce1318336637b695f" \
+  "https://github.com/madler/zlib/archive/"
+
+download \
   "Python-2.7.17.tar.xz" \
   "" \
   "b3b6d2c92f42a60667814358ab9f0cfd" \
@@ -149,10 +155,10 @@ download \
   "https://github.com/openssl/openssl/archive/"
 
 download \
-  "v1.2.11.tar.gz" \
-  "zlib-1.2.11.tar.gz" \
-  "0095d2d2d1f3442ce1318336637b695f" \
-  "https://github.com/madler/zlib/archive/"
+  "master.tar.gz" \
+  "libilbc-master.tar.gz" \
+  "nil" \
+  "https://github.com/TimothyGu/libilbc/archive/"
 
 download \
   "xvidcore-1.3.5.tar.gz" \
@@ -161,7 +167,7 @@ download \
   "http://downloads.xvid.org/downloads/"
 
 download \
-  "x264-master.tar.bz2" \
+  "x264-master.tar.gz" \
   "" \
   "nil" \
   "https://code.videolan.org/videolan/x264/-/archive/master/"
@@ -259,16 +265,16 @@ download \
   "https://github.com/webmproject/libwebp/archive/"
 
 download \
-  "v1.3.6.tar.gz" \
-  "vorbis-1.3.6.tar.gz" \
-  "03e967efb961f65a313459c5d0f4cbfb" \
-  "https://github.com/xiph/vorbis/archive/"
-
-download \
   "v1.3.4.tar.gz" \
   "ogg-1.3.4.tar.gz" \
   "df1a9a95251a289aa5515b869db4b15f" \
   "https://github.com/xiph/ogg/archive/"
+
+download \
+  "v1.3.6.tar.gz" \
+  "vorbis-1.3.6.tar.gz" \
+  "03e967efb961f65a313459c5d0f4cbfb" \
+  "https://github.com/xiph/vorbis/archive/"
 
 download \
   "libtheora-1.1.1.tar.gz" \
@@ -281,24 +287,6 @@ download \
   "Speex-1.2.0.tar.gz" \
   "4bec86331abef56129f9d1c994823f03" \
   "https://github.com/xiph/speex/archive/"
-
-# download \
-#  "n4.0.tar.gz" \
-#  "ffmpeg4.0.tar.gz" \
-#  "4749a5e56f31e7ccebd3f9924972220f" \
-#  "https://github.com/FFmpeg/FFmpeg/archive"
-
-# download \
-#  "n4.1.tar.gz" \
-#  "ffmpeg4.1.tar.gz" \
-#  "53dfa0319f60e0da8835906063311f56" \
-#  "https://github.com/FFmpeg/FFmpeg/archive"
-
-# download \
-#  "n4.2.tar.gz" \
-#  "ffmpeg4.2.tar.gz" \
-#  "199e664666c6cde776f51a4312521489" \
-#  "https://github.com/FFmpeg/FFmpeg/archive"
 
 download \
   "n4.2.2.tar.gz" \
@@ -331,6 +319,19 @@ if [ $is_x86 -eq 1 ]; then
     make -j $jval
     make install
 fi
+
+echo
+/bin/echo -e "\e[93m*** Building zlib (Python Dependency) ***\e[39m"
+echo
+cd $BUILD_DIR/zlib*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
 
 echo
 /bin/echo -e "\e[93m*** Building Python 2.7 ***\e[39m"
@@ -421,21 +422,17 @@ PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
 echo
-/bin/echo -e "\e[93m*** Building zlib ***\e[39m"
+/bin/echo -e "\e[93m*** Building libilbc ***\e[39m"
 echo
-cd $BUILD_DIR/zlib*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-if [ "$platform" = "linux" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
-elif [ "$platform" = "darwin" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
-fi
-PATH="$BIN_DIR:$PATH" make -j $jval
+cd $BUILD_DIR/libilbc-*
+sed 's/lib64/lib/g' -i CMakeLists.txt
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$BUILD_DIR" -DBUILD_SHARED_LIBS=0 -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=/lib
+make -j $jval
 make install
 
-/bin/echo
+echo
 /bin/echo -e "\e[93m*** Building Xvid ***\e[39m"
-/bin/echo
+echo
 cd $BUILD_DIR/xvidcore/build/generic
 sed -i 's/^LN_S=@LN_S@/& -f -v/' platform.inc.in
 ./configure --prefix=$TARGET_DIR --disable-shared --enable-static
@@ -619,6 +616,16 @@ make -j $jval
 make install
 
 echo
+/bin/echo -e "\e[93m*** Building libogg ***\e[39m"
+echo
+cd $BUILD_DIR/ogg*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo
 /bin/echo -e "\e[93m*** Building libvorbis ***\e[39m"
 echo
 cd $BUILD_DIR/vorbis*
@@ -629,18 +636,8 @@ make -j $jval
 make install
 
 echo
-/bin/echo -e "\e[93m*** Building libogg ***\e[39m"
-echo
-cd $BUILD_DIR/ogg*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-./autogen.sh
-./configure --prefix=$TARGET_DIR --disable-shared
-make -j $jval
-make install
-
-/bin/echo
 /bin/echo -e "\e[93mCompiling libtheora...\e[39m"
-/bin/echo
+echo
 cd $BUILD_DIR/libtheora-*
 sed -i 's/png_\(sizeof\)/\1/g' examples/png2theora.c
 ./configure --prefix=$TARGET_DIR --disable-oggtest --disable-vorbistest --with-ogg-includes="$TARGET_DIR/include" --with-ogg-libraries="$TARGET_DIR/build/lib" --with-vorbis-includes="$TARGET_DIR/include" --with-vorbis-libraries="$TARGET_DIR/build/lib" --disable-shared --enable-static
@@ -670,7 +667,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.4 \
+    --extra-version=Tec-2.5 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -722,7 +719,7 @@ elif [ "$platform" = "darwin" ]; then
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.4 \
+    --extra-version=Tec-2.5 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \
