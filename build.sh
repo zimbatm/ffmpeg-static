@@ -155,6 +155,12 @@ download \
   "https://github.com/madler/zlib/archive/"
 
 download \
+  "xvidcore-1.3.5.tar.gz" \
+  "" \
+  "69784ebd917413d8592688ae86d8185f" \
+  "http://downloads.xvid.org/downloads/"
+
+download \
   "x264-master.tar.bz2" \
   "" \
   "nil" \
@@ -421,6 +427,18 @@ fi
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
+/bin/echo
+/bin/echo -e "\e[93m*** Building Xvid ***\e[39m"
+/bin/echo
+cd $BUILD_DIR/xvidcore/build/generic
+sed -i 's/^LN_S=@LN_S@/& -f -v/' platform.inc.in
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+make -j $jval
+sed -i '/libdir.*STATIC_LIB/ s/^/#/' Makefile
+make install
+chmod -v 755 $TARGET_DIR/lib/libxvidcore.so.4.3
+install -v -m755 -d $TARGET_DIR/share/doc/xvidcore-1.3.5/examples && install -v -m644 ../../doc/* $TARGET_DIR/share/doc/xvidcore-1.3.5 && install -v -m644 ../../examples/* $TARGET_DIR/share/doc/xvidcore-1.3.5/examples
+
 echo
 /bin/echo -e "\e[93m*** Building x264 ***\e[39m"
 echo
@@ -637,7 +655,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.2 \
+    --extra-version=Tec-2.3 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -689,7 +707,7 @@ elif [ "$platform" = "darwin" ]; then
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.2 \
+    --extra-version=Tec-2.3 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \

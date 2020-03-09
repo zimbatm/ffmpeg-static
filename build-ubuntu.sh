@@ -15,8 +15,7 @@ sudo apt install \
   libvdpau-dev \
   libxcb1-dev \
   libxcb-shm0-dev \
-  libxcb-xfixes0-dev \
-  libxvidcore-dev
+  libxcb-xfixes0-dev
 #  libcaca-dev \
 #  libfreetype6-dev \
 #  libglib2.0-dev \
@@ -27,6 +26,7 @@ sudo apt install \
 #  libvo-amrwbenc-dev \
 #  libvorbis-dev \
 #  libwebp-dev \
+#  libxvidcore-dev \
 #  zlib1g-dev
 
 # For 12.04
