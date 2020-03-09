@@ -92,12 +92,6 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
-  "v1.2.11.tar.gz" \
-  "zlib-1.2.11.tar.gz" \
-  "0095d2d2d1f3442ce1318336637b695f" \
-  "https://github.com/madler/zlib/archive/"
-
-download \
   "Python-2.7.17.tar.xz" \
   "" \
   "b3b6d2c92f42a60667814358ab9f0cfd" \
@@ -121,6 +115,33 @@ download \
   "d5431bf5456522380d4c2c9c904a6d96" \
   "https://www.freedesktop.org/software/fontconfig/release/"
 
+#download \
+#  "imlib2-1.6.1.tar.bz2" \
+#  "" \
+#  "7b3fbcb974b48822b32b326c6a47764b" \
+#  "https://netix.dl.sourceforge.net/project/enlightenment/imlib2-src/1.6.1/"
+
+#download \
+#  "v0.99.beta19.tar.gz" \
+#  "libcaca-0.99.beta19.tar.gz" \
+#  "2e1ed59dc3cb2f69d3d98fd0e6a205b4" \
+#  "https://github.com/cacalabs/libcaca/archive/"
+##git clone https://github.com/cacalabs/libcaca.git "$BUILD_DIR"/libcaca-clone
+
+download \
+  "vo-amrwbenc-0.1.3.tar.gz" \
+  "" \
+  "f63bb92bde0b1583cb3cb344c12922e0" \
+  "http://downloads.sourceforge.net/opencore-amr/vo-amrwbenc/"
+#git clone https://github.com/mstorsjo/vo-amrwbenc.git "$BUILD_DIR"/vo-amrwbenc-clone
+
+download \
+  "opencore-amr-0.1.3.tar.gz" \
+  "" \
+  "09d2c5dfb43a9f6e9fec8b1ae678e725" \
+  "http://downloads.sourceforge.net/opencore-amr/"
+#git clone https://github.com/BelledonneCommunications/opencore-amr.git "$BUILD_DIR"/opencore-amr-clone
+
 download \
   "OpenSSL_1_0_2o.tar.gz" \
   "" \
@@ -128,7 +149,13 @@ download \
   "https://github.com/openssl/openssl/archive/"
 
 download \
-  "x264-master.tar.gz" \
+  "v1.2.11.tar.gz" \
+  "zlib-1.2.11.tar.gz" \
+  "0095d2d2d1f3442ce1318336637b695f" \
+  "https://github.com/madler/zlib/archive/"
+
+download \
+  "x264-master.tar.bz2" \
   "" \
   "nil" \
   "https://code.videolan.org/videolan/x264/-/archive/master/"
@@ -169,6 +196,12 @@ download \
   "" \
   "83e260acbe4389b54fe08e0bdbf7cddb" \
   "http://downloads.sourceforge.net/project/lame/lame/3.100"
+
+download \
+  "twolame-0.3.13.tar.gz" \
+  "" \
+  "4113d8aa80194459b45b83d4dbde8ddb" \
+  "https://netix.dl.sourceforge.net/project/twolame/twolame/0.3.13/"
 
 download \
   "v1.3.1.tar.gz" \
@@ -220,16 +253,16 @@ download \
   "https://github.com/webmproject/libwebp/archive/"
 
 download \
-  "v1.3.4.tar.gz" \
-  "ogg-1.3.4.tar.gz" \
-  "df1a9a95251a289aa5515b869db4b15f" \
-  "https://github.com/xiph/ogg/archive/"
-
-download \
   "v1.3.6.tar.gz" \
   "vorbis-1.3.6.tar.gz" \
   "03e967efb961f65a313459c5d0f4cbfb" \
   "https://github.com/xiph/vorbis/archive/"
+
+download \
+  "v1.3.4.tar.gz" \
+  "ogg-1.3.4.tar.gz" \
+  "df1a9a95251a289aa5515b869db4b15f" \
+  "https://github.com/xiph/ogg/archive/"
 
 download \
   "Speex-1.2.0.tar.gz" \
@@ -288,19 +321,6 @@ if [ $is_x86 -eq 1 ]; then
 fi
 
 echo
-/bin/echo -e "\e[93m*** Building zlib (Python Dependency) ***\e[39m"
-echo
-cd $BUILD_DIR/zlib*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-if [ "$platform" = "linux" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
-elif [ "$platform" = "darwin" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
-fi
-PATH="$BIN_DIR:$PATH" make -j $jval
-make install
-
-echo
 /bin/echo -e "\e[93m*** Building Python 2.7 ***\e[39m"
 echo
 cd $BUILD_DIR/Python-*
@@ -334,8 +354,45 @@ echo
 echo
 cd $BUILD_DIR/fontconfig*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared --enable-libxml2
+[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
 PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+#echo
+#/bin/echo -e "\e[93m*** Building imlib2 (libcaca dependency)***\e[39m"
+#echo
+#cd $BUILD_DIR/imlib2-*
+#[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+#[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+#PATH="$BIN_DIR:$PATH" make -j $jval
+#make install
+
+#echo
+#/bin/echo -e "\e[93m*** Building libcaca... ***\e[39m"
+#echo
+#cd $BUILD_DIR/libcaca-*
+#[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+#./bootstrap
+#./configure --prefix=$TARGET_DIR --bindir="$BIN_DIR" --disable-shared --enable-static --disable-doc --disable-ruby --disable-csharp --disable-java --disable-python --disable-cxx --enable-ncurses --disable-x11
+#make -j $jval
+#make install
+
+echo
+/bin/echo -e "\e[93m*** Building vo-amrwbenc... ***\e[39m"
+echo
+cd $BUILD_DIR/vo-amrwbenc-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --bindir="$BIN_DIR" --disable-shared --enable-static
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building opencore-amr... ***\e[39m"
+echo
+cd $BUILD_DIR/opencore-amr*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --bindir="$BIN_DIR" --disable-shared --enable-static
+make -j $jval
 make install
 
 echo
@@ -347,6 +404,19 @@ if [ "$platform" = "darwin" ]; then
   PATH="$BIN_DIR:$PATH" ./Configure darwin64-x86_64-cc --prefix=$TARGET_DIR
 elif [ "$platform" = "linux" ]; then
   PATH="$BIN_DIR:$PATH" ./config --prefix=$TARGET_DIR
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building zlib ***\e[39m"
+echo
+cd $BUILD_DIR/zlib*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
 fi
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
@@ -425,6 +495,15 @@ uname -a | grep -q 'aarch64' && lame_build_target="--build=arm-linux" || lame_bu
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 [ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
 make
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building libtwolame ***\e[39m"
+echo
+cd $BUILD_DIR/twolame-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --bindir="$BIN_DIR" --disable-shared --enable-static
+make -j $jval
 make install
 
 echo
@@ -516,9 +595,9 @@ make -j $jval
 make install
 
 echo
-/bin/echo -e "\e[93m*** Building libogg ***\e[39m"
+/bin/echo -e "\e[93m*** Building libvorbis ***\e[39m"
 echo
-cd $BUILD_DIR/ogg*
+cd $BUILD_DIR/vorbis*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 ./autogen.sh
 ./configure --prefix=$TARGET_DIR --disable-shared
@@ -526,9 +605,9 @@ make -j $jval
 make install
 
 echo
-/bin/echo -e "\e[93m*** Building libvorbis ***\e[39m"
+/bin/echo -e "\e[93m*** Building libogg ***\e[39m"
 echo
-cd $BUILD_DIR/vorbis*
+cd $BUILD_DIR/ogg*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 ./autogen.sh
 ./configure --prefix=$TARGET_DIR --disable-shared
@@ -558,7 +637,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.1 \
+    --extra-version=Tec-2.2 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -584,6 +663,7 @@ if [ "$platform" = "linux" ]; then
     --enable-libsoxr \
     --enable-libspeex \
     --enable-libtheora \
+    --enable-libtwolame \
     --enable-libvidstab \
     --enable-libvo-amrwbenc \
     --enable-libvorbis \
@@ -595,14 +675,21 @@ if [ "$platform" = "linux" ]; then
     --enable-libxvid \
     --enable-libzimg \
     --enable-nonfree \
-    --enable-openssl
+    --enable-openssl \
+    --disable-vaapi \
+    --enable-vdpau
+# Not working yet
+#    --enable-libcaca \
+#    --enable-vaapi \
+#
+# ---------------
 elif [ "$platform" = "darwin" ]; then
   [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
   PKG_CONFIG_PATH="${TARGET_DIR}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/Cellar/openssl/1.0.2o_1/lib/pkgconfig" ./configure \
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.1 \
+    --extra-version=Tec-2.2 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \
@@ -643,4 +730,3 @@ make distclean
 date +%H:%M:%S
 spd-say --rate -25 "Build Complete"
 hash -r
- 
