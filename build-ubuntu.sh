@@ -9,21 +9,22 @@ sudo apt install \
   frei0r-plugins-dev \
   libass-dev \
   libcairo2-dev \
-  libopencore-amrnb-dev \
-  libopencore-amrwb-dev \
   libsdl1.2-dev \
   libtheora-dev \
   libva-dev \
   libvdpau-dev \
-  libvo-amrwbenc-dev \
   libxcb1-dev \
   libxcb-shm0-dev \
   libxcb-xfixes0-dev \
   libxvidcore-dev
+#  libcaca-dev \
 #  libfreetype6-dev \
 #  libglib2.0-dev \
+#  libopencore-amrnb-dev \
+#  libopencore-amrwb-dev \
 #  libspeex-dev \
 #  libssl-dev \
+#  libvo-amrwbenc-dev \
 #  libvorbis-dev \
 #  libwebp-dev \
 #  zlib1g-dev
