@@ -10,7 +10,6 @@ sudo apt install \
   libass-dev \
   libcairo2-dev \
   libsdl1.2-dev \
-  libtheora-dev \
   libva-dev \
   libvdpau-dev \
   libxcb1-dev \
@@ -23,6 +22,7 @@ sudo apt install \
 #  libopencore-amrwb-dev \
 #  libspeex-dev \
 #  libssl-dev \
+#  libtheora-dev \
 #  libvo-amrwbenc-dev \
 #  libvorbis-dev \
 #  libwebp-dev \
