@@ -271,6 +271,12 @@ download \
   "https://github.com/xiph/ogg/archive/"
 
 download \
+  "libtheora-1.1.1.tar.gz" \
+  "" \
+  "bb4dc37f0dc97db98333e7160bfbb52b" \
+  "http://downloads.xiph.org/releases/theora/"
+
+download \
   "Speex-1.2.0.tar.gz" \
   "Speex-1.2.0.tar.gz" \
   "4bec86331abef56129f9d1c994823f03" \
@@ -632,6 +638,15 @@ cd $BUILD_DIR/ogg*
 make -j $jval
 make install
 
+/bin/echo
+/bin/echo -e "\e[93mCompiling libtheora...\e[39m"
+/bin/echo
+cd $BUILD_DIR/libtheora-*
+sed -i 's/png_\(sizeof\)/\1/g' examples/png2theora.c
+./configure --prefix=$TARGET_DIR --disable-oggtest --disable-vorbistest --with-ogg-includes="$TARGET_DIR/include" --with-ogg-libraries="$TARGET_DIR/build/lib" --with-vorbis-includes="$TARGET_DIR/include" --with-vorbis-libraries="$TARGET_DIR/build/lib" --disable-shared --enable-static
+make -j $jval
+make install
+
 echo
 /bin/echo -e "\e[93m*** Building libspeex ***\e[39m"
 echo
@@ -655,7 +670,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.3 \
+    --extra-version=Tec-2.4 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -707,7 +722,7 @@ elif [ "$platform" = "darwin" ]; then
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.3 \
+    --extra-version=Tec-2.4 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \
