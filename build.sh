@@ -39,8 +39,8 @@ then
   fi
 fi
 
-[ "$rebuild" -eq 1 ] && echo "Reconfiguring existing packages..."
-[ $is_x86 -ne 1 ] && echo "Not using yasm or nasm on non-x86 platform..."
+[ "$rebuild" -eq 1 ] && echo && /bin/echo -e "\e[93m Reconfiguring existing packages...\e[39m" && echo
+[ $is_x86 -ne 1 ] && echo && /bin/echo -e "\e[93m Not using yasm or nasm on non-x86 platform...\e[39m" && echo
 
 cd `dirname $0`
 ENV_ROOT=`pwd`
@@ -74,7 +74,9 @@ download(){
   REPLACE="$rebuild" CACHE_DIR="$DOWNLOAD_DIR" ../fetchurl "http://cache/$filename"
 }
 
-echo "#### FFmpeg static build ####"
+echo
+/bin/echo -e "\e[93m#### FFmpeg static build ####\e[39m"
+echo
 
 #this is our working directory
 cd $BUILD_DIR
@@ -92,10 +94,40 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
+  "util-macros-1.19.2.tar.gz" \
+  "" \
+  "5059b328fac086b733ffac6607164c41" \
+  "https://www.x.org/archive//individual/util/"
+
+download \
+  "xorgproto-2019.1.tar.bz2" \
+  "" \
+  "802ccb9e977ba3cf94ba798ddb2898a4" \
+  "https://xorg.freedesktop.org/archive/individual/proto/"
+
+download \
   "v1.2.11.tar.gz" \
   "zlib-1.2.11.tar.gz" \
   "0095d2d2d1f3442ce1318336637b695f" \
   "https://github.com/madler/zlib/archive/"
+
+download \
+  "tk8.6.10-src.tar.gz" \
+  "" \
+  "602a47ad9ecac7bf655ada729d140a94" \
+  "https://netix.dl.sourceforge.net/project/tcl/Tcl/8.6.10/"
+
+download \
+  "tcl8.6.10-src.tar.gz" \
+  "" \
+  "97c55573f8520bcab74e21bfd8d0aadc" \
+  "https://netcologne.dl.sourceforge.net/project/tcl/Tcl/8.6.10/"
+
+download \
+  "master.tar.gz" \
+  "libexpat-master.tar.gz" \
+  "nil" \
+  "https://github.com/libexpat/libexpat/archive/"
 
 download \
   "Python-2.7.17.tar.xz" \
@@ -320,6 +352,24 @@ if [ $is_x86 -eq 1 ]; then
     make install
 fi
 
+#echo
+#/bin/echo -e "\e[93m*** Building util-macros (xorgproto Dependency) ***\e[39m"
+#echo
+#cd $BUILD_DIR/util-macros-*
+#[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+#./configure --prefix=$TARGET_DIR
+#make install
+
+#echo
+#/bin/echo -e "\e[93m*** Building xorgproto (libXau Dependency) ***\e[39m"
+#echo
+#cd $BUILD_DIR/xorgproto-*
+#[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+#mkdir build
+#cd build/
+#meson --prefix=$TARGET_DIR .. && ninja
+#ninja install
+
 echo
 /bin/echo -e "\e[93m*** Building zlib (Python Dependency) ***\e[39m"
 echo
@@ -330,6 +380,34 @@ if [ "$platform" = "linux" ]; then
 elif [ "$platform" = "darwin" ]; then
   [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
 fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building tcl (tkinter Dependency) ***\e[39m"
+echo
+cd $BUILD_DIR/tcl*/unix
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --enable-static
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building tkinter (Python Dependency) ***\e[39m"
+echo
+cd $BUILD_DIR/tk*/unix
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./configure --prefix=$TARGET_DIR --with-tcl=$BUILD_DIR/tcl8.6.10/unix --enable-static
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building libexpat (fontconfig Dependency) ***\e[39m"
+echo
+cd $BUILD_DIR/libexpat-*/expat
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./buildconf.sh
+./configure --prefix=$TARGET_DIR --enable-static
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
@@ -666,7 +744,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.5 \
+    --extra-version=Tec-2.5.1 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -710,7 +788,12 @@ if [ "$platform" = "linux" ]; then
 # Not working yet
 #    --enable-libcaca \
 #    --enable-vaapi \
-#
+# Not tested yet
+#    --enable-avresample \
+#    --enable-libvorbis --enable-libtheora \
+#    --enable-libvorbis --enable-libvpx \
+#    --enable-libpulse \
+#    --enable-avresample \
 # ---------------
 elif [ "$platform" = "darwin" ]; then
   [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
@@ -718,7 +801,7 @@ elif [ "$platform" = "darwin" ]; then
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.5 \
+    --extra-version=Tec-2.5.1 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \
