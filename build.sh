@@ -177,7 +177,7 @@ download \
   "opencore-amr-0.1.3.tar.gz" \
   "" \
   "09d2c5dfb43a9f6e9fec8b1ae678e725" \
-  "http://downloads.sourceforge.net/opencore-amr/"
+  "http://downloads.sourceforge.net/opencore-amr/opencore-amr/"
 #git clone https://github.com/BelledonneCommunications/opencore-amr.git "$BUILD_DIR"/opencore-amr-clone
 
 download \
