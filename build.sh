@@ -94,6 +94,12 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
+  "v1.1.0.tar.gz" \
+  "libwebp-1.1.0.tar.gz" \
+  "35831dd0f8d42119691eb36f2b9d23b7" \
+  "https://github.com/webmproject/libwebp/archive/"
+
+download \
   "util-macros-1.19.2.tar.gz" \
   "" \
   "5059b328fac086b733ffac6607164c41" \
@@ -153,18 +159,18 @@ download \
   "d5431bf5456522380d4c2c9c904a6d96" \
   "https://www.freedesktop.org/software/fontconfig/release/"
 
-#download \
-#  "imlib2-1.6.1.tar.bz2" \
-#  "" \
-#  "7b3fbcb974b48822b32b326c6a47764b" \
-#  "https://netix.dl.sourceforge.net/project/enlightenment/imlib2-src/1.6.1/"
+download \
+  "imlib2-1.6.1.tar.bz2" \
+  "" \
+  "7b3fbcb974b48822b32b326c6a47764b" \
+  "https://netix.dl.sourceforge.net/project/enlightenment/imlib2-src/1.6.1/"
 
-#download \
-#  "v0.99.beta19.tar.gz" \
-#  "libcaca-0.99.beta19.tar.gz" \
-#  "2e1ed59dc3cb2f69d3d98fd0e6a205b4" \
-#  "https://github.com/cacalabs/libcaca/archive/"
-##git clone https://github.com/cacalabs/libcaca.git "$BUILD_DIR"/libcaca-clone
+download \
+  "v0.99.beta19.tar.gz" \
+  "libcaca-0.99.beta19.tar.gz" \
+  "2e1ed59dc3cb2f69d3d98fd0e6a205b4" \
+  "https://github.com/cacalabs/libcaca/archive/"
+#git clone https://github.com/cacalabs/libcaca.git "$BUILD_DIR"/libcaca-clone
 
 download \
   "vo-amrwbenc-0.1.3.tar.gz" \
@@ -291,12 +297,6 @@ download \
   "https://github.com/uclouvain/openjpeg/archive/"
 
 download \
-  "v1.1.0.tar.gz" \
-  "libwebp-1.1.0.tar.gz" \
-  "35831dd0f8d42119691eb36f2b9d23b7" \
-  "https://github.com/webmproject/libwebp/archive/"
-
-download \
   "v1.3.4.tar.gz" \
   "ogg-1.3.4.tar.gz" \
   "df1a9a95251a289aa5515b869db4b15f" \
@@ -351,6 +351,16 @@ if [ $is_x86 -eq 1 ]; then
     make -j $jval
     make install
 fi
+
+echo
+/bin/echo -e "\e[93m*** Building libwebp ***\e[39m"
+echo
+cd $BUILD_DIR/libwebp*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
 
 #echo
 #/bin/echo -e "\e[93m*** Building util-macros (xorgproto Dependency) ***\e[39m"
@@ -449,24 +459,25 @@ cd $BUILD_DIR/fontconfig*
 PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
-#echo
-#/bin/echo -e "\e[93m*** Building imlib2 (libcaca dependency)***\e[39m"
-#echo
-#cd $BUILD_DIR/imlib2-*
-#[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-#[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-#PATH="$BIN_DIR:$PATH" make -j $jval
-#make install
+echo
+/bin/echo -e "\e[93m*** Building imlib2 (libcaca dependency)***\e[39m"
+echo
+cd $BUILD_DIR/imlib2-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
 
-#echo
-#/bin/echo -e "\e[93m*** Building libcaca... ***\e[39m"
-#echo
-#cd $BUILD_DIR/libcaca-*
-#[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-#./bootstrap
-#./configure --prefix=$TARGET_DIR --bindir="$BIN_DIR" --disable-shared --enable-static --disable-doc --disable-ruby --disable-csharp --disable-java --disable-python --disable-cxx --enable-ncurses --disable-x11
-#make -j $jval
-#make install
+echo
+/bin/echo -e "\e[93m*** Building libcaca... ***\e[39m"
+echo
+cd $BUILD_DIR/libcaca-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+sed -i 's/"$amvers" "<" "1.5"/"$amvers" "<" "1.05"/g' ./bootstrap
+./bootstrap
+./configure --prefix=$TARGET_DIR --bindir="$BIN_DIR" --enable-static --disable-shared --disable-doc --disable-ruby --disable-csharp --disable-java --disable-cxx --disable-ncurses --disable-x11 --disable-python --disable-cocoa --disable-slang
+make -j $jval
+make install
 
 echo
 /bin/echo -e "\e[93m*** Building vo-amrwbenc... ***\e[39m"
@@ -513,8 +524,8 @@ echo
 echo
 cd $BUILD_DIR/xvidcore/build/generic
 sed -i 's/^LN_S=@LN_S@/& -f -v/' platform.inc.in
-PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-shared --enable-static
-PATH="$BIN_DIR:$PATH" make -j $jval
+./configure --prefix=$TARGET_DIR --disable-shared --enable-static
+make -j $jval
 make install
 chmod -v 755 $TARGET_DIR/lib/libxvidcore.so.4.3
 install -v -m755 -d $TARGET_DIR/share/doc/xvidcore-1.3.5/examples && install -v -m644 ../../doc/* $TARGET_DIR/share/doc/xvidcore-1.3.5 && install -v -m644 ../../examples/* $TARGET_DIR/share/doc/xvidcore-1.3.5/examples
@@ -683,16 +694,6 @@ make -j $jval
 make install
 
 echo
-/bin/echo -e "\e[93m*** Building libwebp ***\e[39m"
-echo
-cd $BUILD_DIR/libwebp*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-./autogen.sh
-./configure --prefix=$TARGET_DIR --disable-shared
-make -j $jval
-make install
-
-echo
 /bin/echo -e "\e[93m*** Building libogg ***\e[39m"
 echo
 cd $BUILD_DIR/ogg*
@@ -731,6 +732,8 @@ cd $BUILD_DIR/speex*
 make -j $jval
 make install
 
+spd-say --rate -25 "Dependencies built"
+
 # FFMpeg
 echo
 /bin/echo -e "\e[93m*** Building FFmpeg ***\e[39m"
@@ -744,7 +747,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.5.1 \
+    --extra-version=Tec-2.6 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -757,6 +760,7 @@ if [ "$platform" = "linux" ]; then
     --enable-gpl \
     --enable-version3 \
     --enable-libass \
+    --enable-libcaca \
     --enable-libfreetype \
     --enable-libfribidi \
     --enable-libfdk-aac \
@@ -801,7 +805,7 @@ elif [ "$platform" = "darwin" ]; then
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.5.1 \
+    --extra-version=Tec-2.6 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \
