@@ -1,3 +1,7 @@
+2.6
+ - added libcaca
+ - more organizing
+
 2.5.1
  - added util-macros-1.19.2, xorgproto-2019.1, tk8.6.10, tcl8.6.10, libexpat to the build
 
