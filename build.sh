@@ -1,7 +1,10 @@
 #!/bin/sh
 
+# ffmpeg static build 2.7
+
 set -e
 set -u
+echo
 date +%H:%M:%S
 
 jflag=
@@ -94,28 +97,52 @@ cd $BUILD_DIR
   "http://www.nasm.us/pub/nasm/releasebuilds/2.14/"
 
 download \
-  "v1.1.0.tar.gz" \
-  "libwebp-1.1.0.tar.gz" \
-  "35831dd0f8d42119691eb36f2b9d23b7" \
-  "https://github.com/webmproject/libwebp/archive/"
+  "v1.2.5.tar.gz" \
+  "zlib-1.2.5.tar.gz" \
+  "9d8bc8be4fb6d9b369884c4a64398ed7" \
+  "https://github.com/madler/zlib/archive/"
 
 download \
-  "util-macros-1.19.2.tar.gz" \
-  "" \
-  "5059b328fac086b733ffac6607164c41" \
-  "https://www.x.org/archive//individual/util/"
+  "master.tar.gz" \
+  "libjpeg-turbo-master.tar.gz" \
+  "nil" \
+  "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/"
 
 download \
-  "xorgproto-2019.1.tar.bz2" \
-  "" \
-  "802ccb9e977ba3cf94ba798ddb2898a4" \
-  "https://xorg.freedesktop.org/archive/individual/proto/"
+  "master.tar.gz" \
+  "libpng-master.tar.gz" \
+  "nil" \
+  "https://github.com/glennrp/libpng/archive/"
 
 download \
   "v1.2.11.tar.gz" \
   "zlib-1.2.11.tar.gz" \
   "0095d2d2d1f3442ce1318336637b695f" \
   "https://github.com/madler/zlib/archive/"
+
+download \
+  "v1.1.0.tar.gz" \
+  "libwebp-1.1.0.tar.gz" \
+  "35831dd0f8d42119691eb36f2b9d23b7" \
+  "https://github.com/webmproject/libwebp/archive/"
+
+download \
+  "tiff-4.1.0.tar.gz" \
+  "" \
+  "nil" \
+  "http://download.osgeo.org/libtiff/"
+
+#download \
+#  "util-macros-1.19.2.tar.gz" \
+#  "" \
+#  "5059b328fac086b733ffac6607164c41" \
+#  "https://www.x.org/archive//individual/util/"
+
+#download \
+#  "xorgproto-2019.1.tar.bz2" \
+#  "" \
+#  "802ccb9e977ba3cf94ba798ddb2898a4" \
+#  "https://xorg.freedesktop.org/archive/individual/proto/"
 
 download \
   "tk8.6.10-src.tar.gz" \
@@ -330,6 +357,8 @@ download \
 
 TARGET_DIR_SED=$(echo $TARGET_DIR | awk '{gsub(/\//, "\\/"); print}')
 
+spd-say --rate -25 "Starting dependencies"
+
 if [ $is_x86 -eq 1 ]; then
     echo
     /bin/echo -e "\e[93m*** Building yasm ***\e[39m"
@@ -353,10 +382,75 @@ if [ $is_x86 -eq 1 ]; then
 fi
 
 echo
+/bin/echo -e "\e[93m*** Building zlib-1.2.5 (libPNG Dependency) ***\e[39m"
+echo
+cd $BUILD_DIR/zlib-1.2.5
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+fi
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building libjpeg-turbo ***\e[39m"
+echo
+cd $BUILD_DIR/libjpeg-turbo-*
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$TARGET_DIR -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_LIBDIR=$TARGET_DIR/lib -DCMAKE_INSTALL_INCLUDEDIR=$TARGET_DIR/include
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building libPNG ***\e[39m"
+echo
+cd $BUILD_DIR/libpng-*
+./configure --prefix=$TARGET_DIR --libdir=$TARGET_DIR/lib --includedir=$TARGET_DIR/include CPPFLAGS=-I$TARGET_DIR/include
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building zlib-1.2.11 (Python Dependency) ***\e[39m"
+echo
+cd $BUILD_DIR/zlib-1.2.11
+# Remove files from zlib-1.2.5 build
+rm -f ../../target/include/zconf.h
+rm -f ../../target/include/zlib.h
+rm -f ../../target/lib/libz.*
+rm -f ../../target/lib/pkgconfig/zlib.pc
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+if [ "$platform" = "linux" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+elif [ "$platform" = "darwin" ]; then
+  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
+fi
+PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo
 /bin/echo -e "\e[93m*** Building libwebp ***\e[39m"
 echo
 cd $BUILD_DIR/libwebp*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building libTIFF ***\e[39m"
+echo
+cd $BUILD_DIR/tiff-*
+./configure --prefix=$TARGET_DIR
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** ReBuilding libwebp ***\e[39m"
+echo
+cd $BUILD_DIR/libwebp*
+make distclean
 ./autogen.sh
 ./configure --prefix=$TARGET_DIR --disable-shared
 make -j $jval
@@ -379,19 +473,6 @@ make install
 #cd build/
 #meson --prefix=$TARGET_DIR .. && ninja
 #ninja install
-
-echo
-/bin/echo -e "\e[93m*** Building zlib (Python Dependency) ***\e[39m"
-echo
-cd $BUILD_DIR/zlib*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-if [ "$platform" = "linux" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
-elif [ "$platform" = "darwin" ]; then
-  [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR
-fi
-PATH="$BIN_DIR:$PATH" make -j $jval
-make install
 
 echo
 /bin/echo -e "\e[93m*** Building tcl (tkinter Dependency) ***\e[39m"
@@ -448,6 +529,22 @@ sed -ri "s:.*(AUX_MODULES.*valid):\1:" modules.cfg
 sed -r "s:.*(#.*SUBPIXEL_RENDERING) .*:\1:" -i include/freetype/config/ftoption.h
 [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-freetype-config --disable-shared
 PATH="$BIN_DIR:$PATH" make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** Building harfbuzz ***\e[39m"
+echo
+cd $BUILD_DIR/harfbuzz-*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+PATH="$BIN_DIR:$PATH" ./autogen.sh
+PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j $jval
+make install
+
+echo
+/bin/echo -e "\e[93m*** ReBuilding FreeType2 after HarfBuzz ***\e[39m"
+echo
+cd $BUILD_DIR/freetype*
 make install
 
 echo
@@ -515,7 +612,7 @@ echo
 echo
 cd $BUILD_DIR/libilbc-*
 sed 's/lib64/lib/g' -i CMakeLists.txt
-cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$BUILD_DIR" -DBUILD_SHARED_LIBS=0 -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=/lib
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DBUILD_SHARED_LIBS=0
 make -j $jval
 make install
 
@@ -524,8 +621,8 @@ echo
 echo
 cd $BUILD_DIR/xvidcore/build/generic
 sed -i 's/^LN_S=@LN_S@/& -f -v/' platform.inc.in
-./configure --prefix=$TARGET_DIR --disable-shared --enable-static
-make -j $jval
+PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static
+PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 chmod -v 755 $TARGET_DIR/lib/libxvidcore.so.4.3
 install -v -m755 -d $TARGET_DIR/share/doc/xvidcore-1.3.5/examples && install -v -m644 ../../doc/* $TARGET_DIR/share/doc/xvidcore-1.3.5 && install -v -m644 ../../examples/* $TARGET_DIR/share/doc/xvidcore-1.3.5/examples
@@ -561,22 +658,6 @@ make -j $jval
 make install
 
 echo
-/bin/echo -e "\e[93m*** Building harfbuzz ***\e[39m"
-echo
-cd $BUILD_DIR/harfbuzz-*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-PATH="$BIN_DIR:$PATH" ./autogen.sh
-PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
-make -j $jval
-make install
-
-echo
-/bin/echo -e "\e[93m*** ReBuilding FreeType2 after HarfBuzz ***\e[39m"
-echo
-cd $BUILD_DIR/freetype*
-make install
-
-echo
 /bin/echo -e "\e[93m*** Building fribidi ***\e[39m"
 echo
 cd $BUILD_DIR/fribidi-*
@@ -590,9 +671,9 @@ echo
 echo
 cd $BUILD_DIR/libass-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-./autogen.sh
-./configure --prefix=$TARGET_DIR --disable-shared
-make -j $jval
+PATH="$BIN_DIR:$PATH" ./autogen.sh
+PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --disable-shared
+PATH="$BIN_DIR:$PATH" make -j $jval
 make install
 
 echo
@@ -602,7 +683,7 @@ cd $BUILD_DIR/lame*
 # The lame build script does not recognize aarch64, so need to set it manually
 uname -a | grep -q 'aarch64' && lame_build_target="--build=arm-linux" || lame_build_target=''
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-[ ! -f config.status ] && ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
+[ ! -f config.status ] && PATH="$BIN_DIR:$PATH" ./configure --prefix=$TARGET_DIR --enable-nasm --disable-shared $lame_build_target
 make
 make install
 
@@ -747,7 +828,7 @@ if [ "$platform" = "linux" ]; then
   PKG_CONFIG_PATH="$TARGET_DIR/lib/pkgconfig" ./configure \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.6 \
+    --extra-version=Tec-2.7 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-libs="-lpthread -lm -lz" \
@@ -805,7 +886,7 @@ elif [ "$platform" = "darwin" ]; then
     --cc=/usr/bin/clang \
     --prefix="$TARGET_DIR" \
     --pkg-config-flags="--static" \
-    --extra-version=Tec-2.6 \
+    --extra-version=Tec-2.7 \
     --extra-cflags="-I$TARGET_DIR/include" \
     --extra-ldflags="-L$TARGET_DIR/lib" \
     --extra-ldexeflags="-Bstatic" \
