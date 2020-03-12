@@ -1,3 +1,7 @@
+2.7
+ - added libtiff, libjpeg-turbo, libPNG
+ - more organizing
+
 2.6
  - added libcaca
  - more organizing
