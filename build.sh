@@ -103,10 +103,10 @@ download \
   "https://github.com/madler/zlib/archive/"
 
 download \
-  "last_x264.tar.bz2" \
+  "x264-stable.tar.gz" \
   "" \
   "nil" \
-  "http://download.videolan.org/pub/videolan/x264/snapshots/"
+  "https://code.videolan.org/videolan/x264/-/archive/stable/"
 
 download \
   "x265_2.7.tar.gz" \
