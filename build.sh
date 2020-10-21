@@ -112,7 +112,7 @@ download \
   "x265_2.7.tar.gz" \
   "" \
   "b0d7d20da2a418fa4f53a559946ea079" \
-  "https://bitbucket.org/multicoreware/x265/downloads/"
+  "http://download.openpkg.org/components/cache/x265/"
 
 download \
   "v0.1.6.tar.gz" \
