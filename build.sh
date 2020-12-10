@@ -85,10 +85,10 @@ cd $BUILD_DIR
   "http://www.tortall.net/projects/yasm/releases/"
 
 [ $is_x86 -eq 1 ] && download \
-  "nasm-2.14.02.tar.bz2" \
+  "nasm-2.15.05.tar.bz2" \
   "" \
-  "3f489aa48ad2aa1f967dc5e293bbd06f" \
-  "https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/"
+  "b8985eddf3a6b08fc246c14f5889147c" \
+  "https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/"
 
 download \
   "OpenSSL_1_0_2o.tar.gz" \
