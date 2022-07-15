@@ -109,9 +109,9 @@ download \
   "https://code.videolan.org/videolan/x264/-/archive/stable/"
 
 download \
-  "x265_2.7.tar.gz" \
+  "x265_3.4.tar.gz" \
   "" \
-  "b0d7d20da2a418fa4f53a559946ea079" \
+  "e37b91c1c114f8815a3f46f039fe79b5" \
   "http://download.openpkg.org/components/cache/x265/"
 
 download \
