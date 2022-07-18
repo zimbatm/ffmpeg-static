@@ -109,9 +109,9 @@ download \
   "https://code.videolan.org/videolan/x264/-/archive/stable/"
 
 download \
-  "x265_2.7.tar.gz" \
+  "x265_3.4.tar.gz" \
   "" \
-  "b0d7d20da2a418fa4f53a559946ea079" \
+  "e37b91c1c114f8815a3f46f039fe79b5" \
   "http://download.openpkg.org/components/cache/x265/"
 
 download \
@@ -273,7 +273,7 @@ cd $BUILD_DIR/x265*
 cd build/linux
 [ $rebuild -eq 1 ] && find . -mindepth 1 ! -name 'make-Makefiles.bash' -and ! -name 'multilib.sh' -exec rm -r {} +
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:BOOL=OFF -DSTATIC_LINK_CRT:BOOL=ON -DENABLE_CLI:BOOL=OFF ../../source
-sed -i 's/-lgcc_s/-lgcc_eh/g' x265.pc
+sed -i '' 's/-lgcc_s/-lgcc_eh/g' x265.pc
 make -j $jval
 make install
 
