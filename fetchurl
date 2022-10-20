@@ -96,6 +96,8 @@ if [ "$UNPACK" -ne 0 ]; then
     extname=.tar.bz2
   elif [ "$filename" != "${filename%.tar.xz}" ]; then
     extname=.tar.xz
+  elif [ "$filename" != "${filename%.bz2}" ]; then
+    extname=.bz2
   else
     stderr extension of $filename is not supported
     exit 1
@@ -116,10 +118,13 @@ if [ "$UNPACK" -ne 0 ]; then
     .tar.xz)
       sh tar "$tarargs" -xJvf "$cache_file"
     ;;
+    .bz2)
+      cp "$cache_file" "$target_dir"
+      sh bunzip2 -f "$filename"
+    ;;
     *)
       stderr BUG, this should not happen
       exit 1
     ;;
   esac
 fi
-

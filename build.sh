@@ -217,6 +217,26 @@ download \
   "4749a5e56f31e7ccebd3f9924972220f" \
   "https://github.com/FFmpeg/FFmpeg/archive"
 
+download \
+  "v2.2.0.tar.gz" \
+  "openh264-2.2.0.tar.gz" \
+  "19d2820c775abfea141d93779f958a9b" \
+  "https://github.com/cisco/openh264/archive/refs/tags/"
+
+if [ "$platform" = "linux" ]; then
+  download \
+    "libopenh264-2.2.0-linux64.6.so.bz2" \
+    "" \
+    "5f2df2c3a952a78706309ab352c026cd" \
+    "http://ciscobinary.openh264.org"
+elif [ "$platform" = "darwin" ]; then
+  download \
+    "libopenh264-2.2.0-osx-x64.6.dylib.bz2" \
+    "" \
+    "d15eb00aabb19c4823bc1fb753cf2657" \
+    "http://ciscobinary.openh264.org"
+fi
+
 [ $download_only -eq 1 ] && exit 0
 
 TARGET_DIR_SED=$(echo $TARGET_DIR | awk '{gsub(/\//, "\\/"); print}')
@@ -273,7 +293,7 @@ cd $BUILD_DIR/x265*
 cd build/linux
 [ $rebuild -eq 1 ] && find . -mindepth 1 ! -name 'make-Makefiles.bash' -and ! -name 'multilib.sh' -exec rm -r {} +
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:BOOL=OFF -DSTATIC_LINK_CRT:BOOL=ON -DENABLE_CLI:BOOL=OFF ../../source
-sed -i '' 's/-lgcc_s/-lgcc_eh/g' x265.pc
+sed -i -e 's/-lgcc_s/-lgcc_eh/g' x265.pc
 make -j $jval
 make install
 
@@ -411,6 +431,17 @@ cd $BUILD_DIR/speex*
 make -j $jval
 make install
 
+echo "*** Building libopenh264 ***"
+cd $BUILD_DIR/openh264*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+make -j `nproc`
+make PREFIX="${TARGET_DIR}" install
+if [ "$platform" = "linux" ]; then
+  cp $DOWNLOAD_DIR/libopenh264-2.2.0-linux64.6.so ${TARGET_DIR}/lib/libopenh264.so.2.2.0
+elif [ "$platform" = "darwin" ]; then
+  cp $DOWNLOAD_DIR/libopenh264-2.2.0-osx-x64.6.dylib.bz2 ${TARGET_DIR}/lib/libopenh264.dylib.2.2.0
+fi
+
 # FFMpeg
 echo "*** Building FFmpeg ***"
 cd $BUILD_DIR/FFmpeg*
@@ -455,7 +486,8 @@ if [ "$platform" = "linux" ]; then
     --enable-libxvid \
     --enable-libzimg \
     --enable-nonfree \
-    --enable-openssl
+    --enable-openssl \
+    --enable-libopenh264
 elif [ "$platform" = "darwin" ]; then
   [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
   PKG_CONFIG_PATH="${TARGET_DIR}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/Cellar/openssl/1.0.2o_1/lib/pkgconfig" ./configure \
@@ -493,7 +525,8 @@ elif [ "$platform" = "darwin" ]; then
     --enable-libxvid \
     --enable-libzimg \
     --enable-nonfree \
-    --enable-openssl
+    --enable-openssl \
+    --enable-libopenh264
 fi
 
 PATH="$BIN_DIR:$PATH" make -j $jval
