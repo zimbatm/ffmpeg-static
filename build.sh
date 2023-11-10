@@ -217,6 +217,12 @@ download \
   "4749a5e56f31e7ccebd3f9924972220f" \
   "https://github.com/FFmpeg/FFmpeg/archive"
 
+download \
+  "SDL2-2.0.22.tar.gz" \
+  "SDL2-2.0.22.tar.gz" \
+  "40aedb499cb2b6f106d909d9d97f869a" \
+  "https://github.com/libsdl-org/SDL/releases/download/release-2.0.22"
+
 [ $download_only -eq 1 ] && exit 0
 
 TARGET_DIR_SED=$(echo $TARGET_DIR | awk '{gsub(/\//, "\\/"); print}')
@@ -273,7 +279,7 @@ cd $BUILD_DIR/x265*
 cd build/linux
 [ $rebuild -eq 1 ] && find . -mindepth 1 ! -name 'make-Makefiles.bash' -and ! -name 'multilib.sh' -exec rm -r {} +
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR" -DENABLE_SHARED:BOOL=OFF -DSTATIC_LINK_CRT:BOOL=ON -DENABLE_CLI:BOOL=OFF ../../source
-sed -i '' 's/-lgcc_s/-lgcc_eh/g' x265.pc
+sed -i 's/-lgcc_s/-lgcc_eh/g' x265.pc
 make -j $jval
 make install
 
@@ -341,7 +347,7 @@ if [ "$platform" = "linux" ]; then
   sed -i "s/prefix=.*/prefix=${TARGET_DIR_SED}\nINC=-I\$(prefix)\/include/" ./Makefile
   sed -i "s/SHARED=.*/SHARED=no/" ./Makefile
 elif [ "$platform" = "darwin" ]; then
-  sed -i "" "s/prefix=.*/prefix=${TARGET_DIR_SED}/" ./Makefile
+  sed -i "s/prefix=./prefix=${TARGET_DIR_SED}/" ./Makefile
 fi
 make install_base
 
@@ -358,7 +364,7 @@ cd $BUILD_DIR/vid.stab-release-*
 if [ "$platform" = "linux" ]; then
   sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
 elif [ "$platform" = "darwin" ]; then
-  sed -i "" "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
+  sed -i "s/vidstab SHARED/vidstab STATIC/" ./CMakeLists.txt
 fi
 PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_DIR"
 make -j $jval
@@ -376,6 +382,7 @@ cd $BUILD_DIR/zimg-release-*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 ./autogen.sh
 ./configure --enable-static  --prefix=$TARGET_DIR --disable-shared
+sed -i 's/size_t/std::size_t/g' src/zimg/colorspace/matrix3.cpp
 make -j $jval
 make install
 
@@ -405,6 +412,14 @@ make install
 
 echo "*** Building libspeex ***"
 cd $BUILD_DIR/speex*
+[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+./autogen.sh
+./configure --prefix=$TARGET_DIR --disable-shared
+make -j $jval
+make install
+
+echo "*** Building libsdl ***"
+cd $BUILD_DIR/SDL*
 [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
 ./autogen.sh
 ./configure --prefix=$TARGET_DIR --disable-shared
