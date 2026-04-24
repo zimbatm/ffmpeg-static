@@ -1,4 +1,4 @@
-FROM ubuntu:noble
+FROM ubuntu:resolute
 
 # Basic packages needed to download dependencies and unpack them.
 RUN apt-get update && apt-get install -y \
